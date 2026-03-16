@@ -1,21 +1,156 @@
 import express from 'express'
-import cors from 'cors'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import os from 'node:os'
+import crypto from 'node:crypto'
 
 const execFileAsync = promisify(execFile)
 const app = express()
-const PORT = Number(process.env.MISSION_CONTROL_API_PORT || 8787)
+
+const PORT = Number(process.env.MISSION_CONTROL_API_PORT || process.env.PORT || 8787)
 const workspaceRoot = path.resolve(process.cwd(), '..', '..')
 const openClawStateDir = path.join(os.homedir(), '.openclaw')
 const cronJobsPath = path.join(openClawStateDir, 'cron', 'jobs.json')
 const openclawLogDir = path.join(process.env.LOCALAPPDATA || '', 'Temp', 'openclaw')
 const routingPolicyPath = path.join(process.cwd(), 'routing-policy.json')
+const distDir = path.join(process.cwd(), 'dist')
+const accessToken = (process.env.MISSION_CONTROL_ACCESS_TOKEN || '').trim()
+const cookieName = process.env.MISSION_CONTROL_COOKIE_NAME || 'mission_control_session'
+const publicOrigin = (process.env.MISSION_CONTROL_PUBLIC_ORIGIN || '').trim()
+const disableLocalBypass = /^(1|true|yes)$/i.test(process.env.MISSION_CONTROL_DISABLE_LOCAL_BYPASS || '')
 
-app.use(cors())
+const routingPolicy = await fs
+  .readFile(routingPolicyPath, 'utf8')
+  .then((raw) => JSON.parse(raw))
+  .catch(() => null)
+
+app.disable('x-powered-by')
+app.set('trust proxy', true)
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function parseCookies(header = '') {
+  return header
+    .split(';')
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce((acc, part) => {
+      const separatorIndex = part.indexOf('=')
+      if (separatorIndex === -1) return acc
+      const key = decodeURIComponent(part.slice(0, separatorIndex).trim())
+      const value = decodeURIComponent(part.slice(separatorIndex + 1).trim())
+      acc[key] = value
+      return acc
+    }, {})
+}
+
+function serializeCookie(name, value, req, overrides = {}) {
+  const isHttps = publicOrigin.startsWith('https://') || req.secure || req.get('x-forwarded-proto') === 'https'
+  const attributes = {
+    httpOnly: true,
+    sameSite: 'Lax',
+    path: '/',
+    secure: isHttps,
+    ...overrides,
+  }
+
+  const parts = [`${encodeURIComponent(name)}=${encodeURIComponent(value)}`]
+  if (attributes.maxAge !== undefined) parts.push(`Max-Age=${Math.max(0, Math.floor(attributes.maxAge))}`)
+  if (attributes.path) parts.push(`Path=${attributes.path}`)
+  if (attributes.httpOnly) parts.push('HttpOnly')
+  if (attributes.sameSite) parts.push(`SameSite=${attributes.sameSite}`)
+  if (attributes.secure) parts.push('Secure')
+  return parts.join('; ')
+}
+
+function loopbackRequested(req) {
+  const forwardedFor = req.get('x-forwarded-for')
+  const remoteAddress = forwardedFor?.split(',')[0]?.trim() || req.socket.remoteAddress || ''
+  return ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(remoteAddress)
+}
+
+function authenticated(req) {
+  if (!accessToken) {
+    return !disableLocalBypass && loopbackRequested(req)
+  }
+
+  const cookies = parseCookies(req.headers.cookie)
+  const bearer = req.get('authorization')?.replace(/^Bearer\s+/i, '').trim()
+  const headerToken = req.get('x-mission-control-token')?.trim()
+  const cookieToken = cookies[cookieName]?.trim()
+
+  return [bearer, headerToken, cookieToken].some((value) => value && crypto.timingSafeEqual(Buffer.from(value), Buffer.from(accessToken)))
+}
+
+function ensureAuthenticated(req, res, next) {
+  if (authenticated(req)) {
+    return next()
+  }
+
+  const requestPath = `${req.baseUrl || ''}${req.path || ''}`
+  if (requestPath.startsWith('/api/')) {
+    return res.status(401).json({
+      error: accessToken
+        ? 'Authentication required. Log in via /login or send Authorization: Bearer <MISSION_CONTROL_ACCESS_TOKEN>.'
+        : 'Remote access is disabled until MISSION_CONTROL_ACCESS_TOKEN is configured on the host.',
+    })
+  }
+
+  return res.redirect(`/login?next=${encodeURIComponent(req.originalUrl || '/')}`)
+}
+
+function loginPage({ error = '', next = '/', remoteLocked = false }) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mission Control login</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: linear-gradient(135deg, #020617, #0f172a); color: #e2e8f0; }
+    .card { width: min(420px, calc(100vw - 32px)); border: 1px solid rgba(148,163,184,.18); background: rgba(15,23,42,.88); border-radius: 20px; padding: 28px; box-shadow: 0 24px 60px rgba(2,6,23,.45); }
+    .eyebrow { font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: #67e8f9; margin-bottom: 10px; }
+    h1 { margin: 0 0 10px; font-size: 28px; }
+    p { color: #94a3b8; line-height: 1.5; }
+    label { display: block; margin: 20px 0 8px; font-size: 13px; color: #cbd5e1; }
+    input { width: 100%; box-sizing: border-box; border-radius: 12px; border: 1px solid #334155; background: #020617; color: white; padding: 14px 16px; font-size: 15px; }
+    button { margin-top: 16px; width: 100%; border: 0; border-radius: 12px; padding: 14px 16px; font-size: 15px; font-weight: 600; background: #06b6d4; color: #082f49; cursor: pointer; }
+    button:hover { background: #22d3ee; }
+    .error { margin-top: 14px; border-radius: 12px; padding: 12px 14px; background: rgba(244,63,94,.12); color: #fecdd3; border: 1px solid rgba(244,63,94,.25); }
+    .note { margin-top: 14px; font-size: 13px; color: #64748b; }
+    code { color: #e2e8f0; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="eyebrow">Jarvis Mission Control</div>
+    <h1>Private live dashboard</h1>
+    <p>Runtime state stays on this machine. Log in with the Mission Control access token to view live status remotely.</p>
+    ${remoteLocked ? '<div class="error">Remote access is disabled because <code>MISSION_CONTROL_ACCESS_TOKEN</code> is not configured on the host yet.</div>' : ''}
+    ${error ? `<div class="error">${escapeHtml(error)}</div>` : ''}
+    <form method="post" action="/auth/login">
+      <input type="hidden" name="next" value="${escapeHtml(next)}" />
+      <label for="token">Access token</label>
+      <input id="token" name="token" type="password" autocomplete="current-password" placeholder="Paste MISSION_CONTROL_ACCESS_TOKEN" ${remoteLocked ? 'disabled' : ''} required />
+      <button type="submit" ${remoteLocked ? 'disabled' : ''}>Open Mission Control</button>
+    </form>
+    <div class="note">Tip: use a tunnel or private network in front of this app, but keep the token anyway. Defense in depth beats regret.</div>
+  </main>
+</body>
+</html>`
+}
 
 async function runOpenClaw(args) {
   const { stdout } = await execFileAsync('cmd.exe', ['/d', '/s', '/c', 'openclaw', ...args], {
@@ -32,10 +167,6 @@ async function safeRun(args, fallback = null) {
   } catch (error) {
     return fallback ?? { error: error instanceof Error ? error.message : String(error) }
   }
-}
-
-function healthFromBool(ok) {
-  return ok ? 'healthy' : 'critical'
 }
 
 function formatRelativeMs(ageMs) {
@@ -132,6 +263,38 @@ function parseLogEvents(lines) {
   }
   return events.slice(-8).reverse()
 }
+
+app.get('/healthz', (_req, res) => {
+  res.json({ ok: true, authConfigured: Boolean(accessToken), publicOrigin: publicOrigin || null })
+})
+
+app.get('/login', (req, res) => {
+  const next = typeof req.query.next === 'string' ? req.query.next : '/'
+  res.type('html').send(loginPage({ next, remoteLocked: !accessToken }))
+})
+
+app.post('/auth/login', (req, res) => {
+  const next = typeof req.body?.next === 'string' && req.body.next.startsWith('/') ? req.body.next : '/'
+  const token = typeof req.body?.token === 'string' ? req.body.token.trim() : ''
+
+  if (!accessToken) {
+    return res.status(503).type('html').send(loginPage({ next, remoteLocked: true }))
+  }
+
+  if (!token || token.length !== accessToken.length || !crypto.timingSafeEqual(Buffer.from(token), Buffer.from(accessToken))) {
+    return res.status(401).type('html').send(loginPage({ next, error: 'Invalid access token.', remoteLocked: false }))
+  }
+
+  res.setHeader('Set-Cookie', serializeCookie(cookieName, accessToken, req, { maxAge: 60 * 60 * 24 * 14 }))
+  return res.redirect(next)
+})
+
+app.post('/auth/logout', (req, res) => {
+  res.setHeader('Set-Cookie', serializeCookie(cookieName, '', req, { maxAge: 0 }))
+  res.status(204).end()
+})
+
+app.use('/api', ensureAuthenticated)
 
 app.get('/api/overview', async (_req, res) => {
   try {
@@ -235,6 +398,11 @@ app.get('/api/overview', async (_req, res) => {
       events,
       attention,
       automations,
+      auth: {
+        required: Boolean(accessToken),
+        via: accessToken ? 'token-or-cookie' : 'loopback-only',
+        publicOrigin: publicOrigin || null,
+      },
       raw: {
         status,
         gatewayStatus,
@@ -249,6 +417,30 @@ app.get('/api/overview', async (_req, res) => {
   }
 })
 
+if (await fs.stat(distDir).then(() => true).catch(() => false)) {
+  app.use(ensureAuthenticated)
+  app.use(express.static(distDir, { index: false }))
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(distDir, 'index.html'))
+  })
+} else {
+  app.get('/', ensureAuthenticated, (_req, res) => {
+    res
+      .type('html')
+      .send('<p style="font-family:system-ui;padding:24px">Mission Control build not found. Run <code>npm run build</code> in <code>apps/mission-control</code> first.</p>')
+  })
+}
+
 app.listen(PORT, () => {
   console.log(`Mission Control API listening on http://127.0.0.1:${PORT}`)
+  if (publicOrigin) {
+    console.log(`Mission Control public origin: ${publicOrigin}`)
+  }
+  if (accessToken) {
+    console.log('Mission Control auth: enabled')
+  } else if (!disableLocalBypass) {
+    console.log('Mission Control auth: loopback-only (set MISSION_CONTROL_ACCESS_TOKEN for remote access)')
+  } else {
+    console.log('Mission Control auth: locked (set MISSION_CONTROL_ACCESS_TOKEN to enable access)')
+  }
 })

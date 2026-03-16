@@ -9,6 +9,7 @@ Mission Control is a thin operational UI over OpenClaw runtime state. It should 
 - State/query: TanStack Query
 - Charts: lightweight only if needed later
 - Backend strategy: consume existing OpenClaw APIs where available; add a narrow local adapter layer only if necessary
+- Live deployment strategy: serve the built frontend from the local adapter process and expose it through a private tunnel or private network, not a public static host
 
 ## Data Domains
 

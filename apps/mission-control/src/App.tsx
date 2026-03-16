@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Activity, AlertTriangle, Bot, Clock3, RefreshCw, ShieldAlert, Zap } from 'lucide-react'
+import { Activity, AlertTriangle, Bot, Clock3, RefreshCw, ShieldAlert, Zap, LogOut, Lock } from 'lucide-react'
 
 type Health = 'healthy' | 'warning' | 'critical'
 
@@ -51,6 +51,11 @@ type OverviewResponse = {
   agents: AgentItem[]
   attention: AttentionItemType[]
   automations: AutomationItem[]
+  auth?: {
+    required: boolean
+    via: string
+    publicOrigin: string | null
+  }
   raw?: {
     routingPolicy?: {
       owner?: string
@@ -72,11 +77,17 @@ async function fetchOverview(): Promise<OverviewResponse> {
   const apiUrl = `${import.meta.env.BASE_URL}api/overview`
 
   try {
-    const response = await fetch(apiUrl)
+    const response = await fetch(apiUrl, { credentials: 'include' })
+    if (response.status === 401) {
+      throw new Error('Authentication required. Open the Mission Control host in a browser and log in first.')
+    }
     if (response.ok) {
       return response.json()
     }
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Authentication required')) {
+      throw error
+    }
     // fall through to bundled snapshot for hosted preview mode
   }
 
@@ -87,12 +98,22 @@ async function fetchOverview(): Promise<OverviewResponse> {
   return fallbackResponse.json()
 }
 
+async function logout() {
+  await fetch(`${import.meta.env.BASE_URL}auth/logout`, {
+    method: 'POST',
+    credentials: 'include',
+  })
+  window.location.href = `${import.meta.env.BASE_URL}login`
+}
+
 function App() {
   const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ['overview'],
     queryFn: fetchOverview,
     refetchInterval: 30000,
   })
+
+  const isLive = Boolean(data?.auth)
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -104,9 +125,14 @@ function App() {
             <p className="mt-2 max-w-3xl text-sm text-slate-400">
               Live signal view of health, agents, automations, and intervention points. Built for fast decisions, not dashboard theater.
             </p>
-            <p className="mt-3 text-xs text-slate-500">
-              {data?.fetchedAt ? `Last refresh: ${new Date(data.fetchedAt).toLocaleString()}` : 'Waiting for first live snapshot...'}
-            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+              <span>{data?.fetchedAt ? `Last refresh: ${new Date(data.fetchedAt).toLocaleString()}` : 'Waiting for first live snapshot...'}</span>
+              {isLive ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-1 text-emerald-300">
+                  <Lock className="h-3.5 w-3.5" /> Private live mode
+                </span>
+              ) : null}
+            </div>
           </div>
           <div className="flex gap-3">
             <button
@@ -115,9 +141,18 @@ function App() {
             >
               <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} /> Refresh
             </button>
-            <button className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-cyan-400">
-              <Zap className="h-4 w-4" /> Quick actions
-            </button>
+            {isLive ? (
+              <button
+                onClick={() => void logout()}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
+              >
+                <LogOut className="h-4 w-4" /> Log out
+              </button>
+            ) : (
+              <button className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-cyan-400">
+                <Zap className="h-4 w-4" /> Quick actions
+              </button>
+            )}
           </div>
         </header>
 
@@ -208,6 +243,12 @@ function App() {
                 <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">Tier 1 actions require explicit confirmation.</li>
                 <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">Preserve exact commands for approvals.</li>
                 <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">The dashboard reads local OpenClaw state through a thin adapter API.</li>
+                {data?.auth ? (
+                  <li className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+                    Access mode: <span className="font-medium text-emerald-300">{data.auth.via}</span>
+                    {data.auth.publicOrigin ? <div className="mt-1 text-slate-400">Origin: {data.auth.publicOrigin}</div> : null}
+                  </li>
+                ) : null}
               </ul>
             </Panel>
 
@@ -221,6 +262,10 @@ function App() {
                   </li>
                 ))}
               </ul>
+            </Panel>
+
+            <Panel title="Routing policy" icon={<Lock className="h-4 w-4" />}>
+              <RoutingPolicyCard data={data?.raw?.routingPolicy} />
             </Panel>
           </div>
         </section>
