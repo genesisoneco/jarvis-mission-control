@@ -1,0 +1,91 @@
+{
+  "fetchedAt": "2026-03-17T00:00:00.000Z",
+  "stats": [
+    {
+      "label": "Gateway",
+      "value": "Preview",
+      "health": "warning",
+      "note": "Static GitHub Pages preview does not include the local OpenClaw gateway adapter."
+    },
+    {
+      "label": "Pending approvals",
+      "value": "Preview",
+      "health": "warning",
+      "note": "Approval queue is disabled in hosted preview mode."
+    },
+    {
+      "label": "Active sessions",
+      "value": "Preview",
+      "health": "warning",
+      "note": "Live session data requires the local adapter API."
+    },
+    {
+      "label": "Cron failures",
+      "value": "Preview",
+      "health": "warning",
+      "note": "Hosted preview shows product/UI state, not live machine state."
+    }
+  ],
+  "events": [
+    {
+      "time": "now",
+      "severity": "warning",
+      "title": "Hosted preview mode",
+      "detail": "This web URL is a GitHub Pages deployment of the Mission Control UI shell with a bundled snapshot fallback."
+    }
+  ],
+  "agents": [
+    {
+      "name": "Jarvis",
+      "state": "Preview",
+      "model": "n/a",
+      "focus": "Operator orchestration",
+      "initials": "JV",
+      "avatarClass": "from-cyan-500 to-blue-600",
+      "note": "Live activity requires the local adapter API."
+    },
+    {
+      "name": "Elon",
+      "state": "Preview",
+      "model": "Mission Control update lane",
+      "focus": "Engineering tasks",
+      "initials": "EL",
+      "avatarClass": "from-amber-400 to-orange-600",
+      "note": "Mission Control update work routes Qwen → Gemini Flash → OpenAI."
+    }
+  ],
+  "attention": [
+    {
+      "title": "Hosted preview only",
+      "detail": "Use the local app + adapter for real runtime controls; this public URL is for viewing the dashboard surface on the web."
+    }
+  ],
+  "automations": [
+    {
+      "name": "GitHub Pages deploy",
+      "state": "healthy",
+      "detail": "Publishes the Mission Control preview UI from the repository."
+    }
+  ],
+  "raw": {
+    "routingPolicy": {
+      "owner": "elon",
+      "lanes": {
+        "defaultEngineering": {
+          "description": "Substantial engineering, architecture, critical debugging, and important implementation work.",
+          "modelOrder": ["openai", "gemini-flash", "qwen"]
+        },
+        "missionControlUpdate": {
+          "description": "Mission Control maintenance, low-complexity updates, progress pushes, routine UI iteration, and light refactors.",
+          "modelOrder": ["qwen", "gemini-flash", "openai"],
+          "escalateWhen": [
+            "architecture changes",
+            "critical debugging",
+            "risky refactors",
+            "substantial implementation work"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -69,11 +69,22 @@ const healthClasses: Record<Health, string> = {
 }
 
 async function fetchOverview(): Promise<OverviewResponse> {
-  const response = await fetch('/api/overview')
-  if (!response.ok) {
-    throw new Error(`Failed to load overview (${response.status})`)
+  const apiUrl = `${import.meta.env.BASE_URL}api/overview`
+
+  try {
+    const response = await fetch(apiUrl)
+    if (response.ok) {
+      return response.json()
+    }
+  } catch {
+    // fall through to bundled snapshot for hosted preview mode
   }
-  return response.json()
+
+  const fallbackResponse = await fetch(`${import.meta.env.BASE_URL}overview-snapshot.json`)
+  if (!fallbackResponse.ok) {
+    throw new Error(`Failed to load overview snapshot (${fallbackResponse.status})`)
+  }
+  return fallbackResponse.json()
 }
 
 function App() {

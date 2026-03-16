@@ -32,6 +32,11 @@ npm run build
 - For larger architecture, critical debugging, or substantial implementation work, use Elon's default engineering lane instead.
 - The app's machine-readable routing source of truth lives in `routing-policy.json`.
 
+## Hosted preview
+- The GitHub Pages deployment is a hosted preview of the UI shell.
+- If the local `/api/overview` adapter is unavailable, the frontend falls back to `public/overview-snapshot.json`.
+- For real local runtime state and controls, run the app with the local adapter (`npm run dev`).
+
 ## Related docs
 - `../../docs/mission-control/mission-control-v1.md`
 - `../../docs/mission-control/mission-control-architecture.md`
