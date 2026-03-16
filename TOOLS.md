@@ -11,7 +11,21 @@ Things like:
 - Preferred voices for TTS
 - Speaker/room names
 - Device nicknames
+- Channel/control-surface notes
 - Anything environment-specific
+
+## Local Authorization Notes
+
+- Follow `CHANNEL_AUTHORIZATION.md` for trust-tier decisions.
+- webchat direct with Richard = Tier 1
+- Richard's Discord DM with Jarvis = Tier 1
+- Discord channel `1482611310771572921` = Tier 1 private admin/control channel
+- Discord channel `1482916925175763107` (`📡｜ops-comms`) = Tier 1 operations/communications control channel
+- `📡｜ops-comms` is the preferred Trinity surface for emails, inbox work, reminders, calendar coordination, reports, docs, posts, and other human-facing communication
+- mirrored Discord `communication` channel = Tier 2
+- other shared/public Discord channels = Tier 3
+- Runtime/admin/config changes are Tier 1 only.
+- Trinity-style communication work can happen in Tier 1 or Tier 2.
 
 ## Examples
 
