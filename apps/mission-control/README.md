@@ -26,6 +26,12 @@ npm run build
 - cron health
 - quick intervention actions
 
+## Engineering routing note
+- Mission Control remains an Elon-owned engineering surface.
+- For Mission Control maintenance, progress updates, routine UI iteration, and other low-complexity update passes, prefer model routing: local Qwen -> Gemini Flash -> OpenAI.
+- For larger architecture, critical debugging, or substantial implementation work, use Elon's default engineering lane instead.
+- The app's machine-readable routing source of truth lives in `routing-policy.json`.
+
 ## Related docs
 - `../../docs/mission-control/mission-control-v1.md`
 - `../../docs/mission-control/mission-control-architecture.md`

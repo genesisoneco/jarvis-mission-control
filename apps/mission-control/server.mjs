@@ -13,6 +13,7 @@ const workspaceRoot = path.resolve(process.cwd(), '..', '..')
 const openClawStateDir = path.join(os.homedir(), '.openclaw')
 const cronJobsPath = path.join(openClawStateDir, 'cron', 'jobs.json')
 const openclawLogDir = path.join(process.env.LOCALAPPDATA || '', 'Temp', 'openclaw')
+const routingPolicyPath = path.join(process.cwd(), 'routing-policy.json')
 
 app.use(cors())
 
@@ -183,6 +184,8 @@ app.get('/api/overview', async (_req, res) => {
       detail: job.state?.nextRunAtMs ? `Next ${new Date(job.state.nextRunAtMs).toLocaleString()}` : 'No next run scheduled',
     }))
 
+    const missionControlLane = routingPolicy?.lanes?.missionControlUpdate?.modelOrder?.join(' -> ')
+
     const attention = [
       scopeIssue
         ? { title: 'Repair gateway auth path', detail: 'Control UI requests are hitting missing operator.read scope.' }
@@ -192,6 +195,9 @@ app.get('/api/overview', async (_req, res) => {
         : null,
       failingJobs.length > 0
         ? { title: 'Review failing automation', detail: `${failingJobs.length} cron job(s) have recent errors.` }
+        : null,
+      missionControlLane
+        ? { title: 'Mission Control update lane', detail: `Low-complexity Mission Control passes route via ${missionControlLane}.` }
         : null,
     ].filter(Boolean)
 
@@ -233,6 +239,7 @@ app.get('/api/overview', async (_req, res) => {
         status,
         gatewayStatus,
         health,
+        routingPolicy,
       },
     })
   } catch (error) {

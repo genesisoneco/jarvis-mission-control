@@ -1,0 +1,19 @@
+{
+  "owner": "elon",
+  "lanes": {
+    "defaultEngineering": {
+      "description": "Substantial engineering, architecture, critical debugging, and important implementation work.",
+      "modelOrder": ["openai", "gemini-flash", "qwen"]
+    },
+    "missionControlUpdate": {
+      "description": "Mission Control maintenance, low-complexity updates, progress pushes, routine UI iteration, and light refactors.",
+      "modelOrder": ["qwen", "gemini-flash", "openai"],
+      "escalateWhen": [
+        "architecture changes",
+        "critical debugging",
+        "risky refactors",
+        "substantial implementation work"
+      ]
+    }
+  }
+}

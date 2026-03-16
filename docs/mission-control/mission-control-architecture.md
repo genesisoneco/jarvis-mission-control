@@ -150,6 +150,12 @@ apps/mission-control/
 - Approval actions should preserve exact command or action context
 - Do not assume group channels are trusted admin surfaces
 
+## Engineering Routing Policy
+- Mission Control is still owned by Elon as the engineering specialist.
+- For Mission Control maintenance, low-complexity updates, routine UI iteration, progress pushes, and similar token-sensitive passes, prefer local Qwen first, Gemini Flash second, OpenAI third.
+- For larger architecture changes, critical debugging, risky refactors, or substantial implementation work, revert to Elon's default engineering lane: OpenAI first, Gemini Flash second, local Qwen third.
+- If a lightweight Mission Control task turns out to be more complex than expected, explicitly escalate the model lane rather than forcing the cheaper lane to carry it.
+
 ## UX Rules
 - Default sort by urgency
 - No noisy animations

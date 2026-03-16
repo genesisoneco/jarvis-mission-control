@@ -38,6 +38,12 @@ type AutomationItem = {
   detail: string
 }
 
+type RoutingLane = {
+  description: string
+  modelOrder: string[]
+  escalateWhen?: string[]
+}
+
 type OverviewResponse = {
   fetchedAt: string
   stats: Stat[]
@@ -45,6 +51,15 @@ type OverviewResponse = {
   agents: AgentItem[]
   attention: AttentionItemType[]
   automations: AutomationItem[]
+  raw?: {
+    routingPolicy?: {
+      owner?: string
+      lanes?: {
+        defaultEngineering?: RoutingLane
+        missionControlUpdate?: RoutingLane
+      }
+    }
+  }
 }
 
 const healthClasses: Record<Health, string> = {
@@ -230,6 +245,30 @@ function ActionButton({ label }: { label: string }) {
 
 function MutedBlock({ text }: { text: string }) {
   return <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-400">{text}</div>
+}
+
+function RoutingPolicyCard({ data }: { data?: NonNullable<OverviewResponse['raw']>['routingPolicy'] }) {
+  if (!data?.lanes) {
+    return <MutedBlock text="No routing policy loaded." />
+  }
+
+  const updateLane = data.lanes.missionControlUpdate
+  const defaultLane = data.lanes.defaultEngineering
+
+  return (
+    <div className="space-y-3 text-sm text-slate-300">
+      <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4">
+        <div className="font-medium text-cyan-200">Mission Control update lane</div>
+        <div className="mt-1 text-slate-400">{updateLane?.description}</div>
+        <div className="mt-2 text-xs uppercase tracking-wide text-slate-500">{updateLane?.modelOrder?.join(' → ')}</div>
+      </div>
+      <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+        <div className="font-medium text-white">Default engineering lane</div>
+        <div className="mt-1 text-slate-400">{defaultLane?.description}</div>
+        <div className="mt-2 text-xs uppercase tracking-wide text-slate-500">{defaultLane?.modelOrder?.join(' → ')}</div>
+      </div>
+    </div>
+  )
 }
 
 function LoadingCard() {
