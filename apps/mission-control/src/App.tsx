@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { Activity, AlertTriangle, Bot, Clock3, RefreshCw, ShieldAlert, Zap } from 'lucide-react'
 
 type Health = 'healthy' | 'warning' | 'critical'
@@ -16,40 +17,35 @@ type EventItem = {
   detail: string
 }
 
-const stats: Stat[] = [
-  { label: 'Gateway', value: 'Degraded', health: 'warning', note: 'Loopback reachable, admin auth unstable' },
-  { label: 'Pending approvals', value: '3', health: 'warning', note: '1 sensitive, 2 routine' },
-  { label: 'Active sessions', value: '15', health: 'healthy', note: 'Mixed agent + cron activity' },
-  { label: 'Cron failures', value: '1', health: 'warning', note: 'Last 24h' },
-]
+type AgentItem = {
+  name: string
+  state: string
+  model: string
+  focus: string
+  initials: string
+  avatarClass: string
+  note: string
+}
 
-const events: EventItem[] = [
-  {
-    time: '23:22',
-    severity: 'warning',
-    title: 'Gateway auth scope issue',
-    detail: 'Control UI session missing operator.read; reconnect path needed.',
-  },
-  {
-    time: '23:18',
-    severity: 'healthy',
-    title: 'Discord provider recovered',
-    detail: 'Health monitor restarted the provider and restored connectivity.',
-  },
-  {
-    time: '22:54',
-    severity: 'critical',
-    title: 'Cron timeout',
-    detail: 'One research task exceeded timeout budget and fell back.',
-  },
-]
+type AttentionItemType = {
+  title: string
+  detail: string
+}
 
-const agents = [
-  { name: 'Jarvis', state: 'Active', model: 'gpt-5.4', focus: 'Operator orchestration' },
-  { name: 'Elon', state: 'Idle', model: 'fallback-aware', focus: 'Engineering tasks' },
-  { name: 'Jensen', state: 'Scheduled', model: 'gemini-flash', focus: 'Research cron runs' },
-  { name: 'Trinity', state: 'Standby', model: 'local-qwen', focus: 'Comms + approvals' },
-]
+type AutomationItem = {
+  name: string
+  state: string
+  detail: string
+}
+
+type OverviewResponse = {
+  fetchedAt: string
+  stats: Stat[]
+  events: EventItem[]
+  agents: AgentItem[]
+  attention: AttentionItemType[]
+  automations: AutomationItem[]
+}
 
 const healthClasses: Record<Health, string> = {
   healthy: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
@@ -57,7 +53,21 @@ const healthClasses: Record<Health, string> = {
   critical: 'border-rose-500/30 bg-rose-500/10 text-rose-300',
 }
 
+async function fetchOverview(): Promise<OverviewResponse> {
+  const response = await fetch('/api/overview')
+  if (!response.ok) {
+    throw new Error(`Failed to load overview (${response.status})`)
+  }
+  return response.json()
+}
+
 function App() {
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
+    queryKey: ['overview'],
+    queryFn: fetchOverview,
+    refetchInterval: 30000,
+  })
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-7xl px-6 py-8">
@@ -66,12 +76,18 @@ function App() {
             <p className="mb-2 text-xs uppercase tracking-[0.3em] text-cyan-300">Jarvis Mission Control</p>
             <h1 className="text-3xl font-semibold text-white">Operator dashboard for OpenClaw</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-400">
-              High-signal view of health, approvals, agents, and interventions. Built for fast decisions, not dashboard theater.
+              Live signal view of health, agents, automations, and intervention points. Built for fast decisions, not dashboard theater.
+            </p>
+            <p className="mt-3 text-xs text-slate-500">
+              {data?.fetchedAt ? `Last refresh: ${new Date(data.fetchedAt).toLocaleString()}` : 'Waiting for first live snapshot...'}
             </p>
           </div>
           <div className="flex gap-3">
-            <button className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700">
-              <RefreshCw className="h-4 w-4" /> Refresh
+            <button
+              onClick={() => refetch()}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
+            >
+              <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} /> Refresh
             </button>
             <button className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-cyan-400">
               <Zap className="h-4 w-4" /> Quick actions
@@ -79,31 +95,44 @@ function App() {
           </div>
         </header>
 
+        {error ? (
+          <div className="mb-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
+            {(error as Error).message}
+          </div>
+        ) : null}
+
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {stats.map((stat) => (
+          {(data?.stats ?? []).map((stat) => (
             <div key={stat.label} className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm text-slate-400">{stat.label}</span>
-                <span className={`rounded-full border px-2 py-1 text-xs ${healthClasses[stat.health]}`}>
-                  {stat.health}
-                </span>
+                <span className={`rounded-full border px-2 py-1 text-xs ${healthClasses[stat.health]}`}>{stat.health}</span>
               </div>
               <div className="text-3xl font-semibold text-white">{stat.value}</div>
               <p className="mt-2 text-sm text-slate-400">{stat.note}</p>
             </div>
           ))}
+          {isLoading && !data ? <LoadingCard /> : null}
         </section>
 
         <section className="mt-6 grid gap-6 xl:grid-cols-[1.4fr_1fr_1fr]">
           <div className="space-y-6">
             <Panel title="Active agents" icon={<Bot className="h-4 w-4" />}>
               <div className="space-y-3">
-                {agents.map((agent) => (
+                {(data?.agents ?? []).map((agent) => (
                   <div key={agent.name} className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium text-white">{agent.name}</div>
-                        <div className="text-sm text-slate-400">{agent.focus}</div>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`flex h-14 w-14 items-center justify-center rounded-md bg-gradient-to-br ${agent.avatarClass} text-sm font-semibold tracking-wide text-white shadow-lg shadow-slate-950/40`}
+                        >
+                          {agent.initials}
+                        </div>
+                        <div>
+                          <div className="font-medium text-white">{agent.name}</div>
+                          <div className="text-sm text-slate-400">{agent.focus}</div>
+                          <div className="mt-1 text-xs text-slate-500">{agent.note}</div>
+                        </div>
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-cyan-300">{agent.state}</div>
@@ -117,9 +146,9 @@ function App() {
 
             <Panel title="Recent events" icon={<Activity className="h-4 w-4" />}>
               <div className="space-y-3">
-                {events.map((event) => (
+                {(data?.events ?? []).map((event) => (
                   <div key={`${event.time}-${event.title}`} className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-                    <div className="mb-1 flex items-center justify-between">
+                    <div className="mb-1 flex items-center justify-between gap-4">
                       <div className="font-medium text-white">{event.title}</div>
                       <span className={`rounded-full border px-2 py-1 text-xs ${healthClasses[event.severity]}`}>{event.time}</span>
                     </div>
@@ -132,9 +161,11 @@ function App() {
 
           <div className="space-y-6">
             <Panel title="Attention queue" icon={<AlertTriangle className="h-4 w-4" />}>
-              <AttentionItem title="Repair gateway auth path" detail="Refresh admin token and invalidate stale dashboard session." />
-              <AttentionItem title="Review pending approvals" detail="One sensitive action requires Tier 1 confirmation." />
-              <AttentionItem title="Inspect cron timeout" detail="Research job exceeded budget and needs prompt/runtime tuning." />
+              {(data?.attention ?? []).length ? (
+                data?.attention.map((item) => <AttentionCard key={item.title} title={item.title} detail={item.detail} />)
+              ) : (
+                <MutedBlock text="Nothing urgent is currently screaming for attention." />
+              )}
             </Panel>
 
             <Panel title="Quick actions" icon={<Zap className="h-4 w-4" />}>
@@ -150,15 +181,19 @@ function App() {
               <ul className="space-y-3 text-sm text-slate-300">
                 <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">Tier 1 actions require explicit confirmation.</li>
                 <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">Preserve exact commands for approvals.</li>
-                <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">Do not expose noisy logs by default; summarize first.</li>
+                <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">The dashboard reads local OpenClaw state through a thin adapter API.</li>
               </ul>
             </Panel>
 
             <Panel title="Automation status" icon={<Clock3 className="h-4 w-4" />}>
               <ul className="space-y-3 text-sm text-slate-300">
-                <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">Jarvis Daily Briefing — healthy</li>
-                <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">Research Lab Scout — warning</li>
-                <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">Heartbeat jobs — mostly disabled</li>
+                {(data?.automations ?? []).map((item) => (
+                  <li key={item.name} className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+                    <div className="font-medium text-white">{item.name}</div>
+                    <div className="mt-1 text-xs uppercase tracking-wide text-slate-500">{item.state}</div>
+                    <div className="mt-2 text-slate-400">{item.detail}</div>
+                  </li>
+                ))}
               </ul>
             </Panel>
           </div>
@@ -180,7 +215,7 @@ function Panel({ title, icon, children }: { title: string; icon: React.ReactNode
   )
 }
 
-function AttentionItem({ title, detail }: { title: string; detail: string }) {
+function AttentionCard({ title, detail }: AttentionItemType) {
   return (
     <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
       <div className="font-medium text-amber-200">{title}</div>
@@ -190,11 +225,15 @@ function AttentionItem({ title, detail }: { title: string; detail: string }) {
 }
 
 function ActionButton({ label }: { label: string }) {
-  return (
-    <button className="w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-left text-sm text-slate-200 hover:bg-slate-800">
-      {label}
-    </button>
-  )
+  return <button className="mb-3 w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-left text-sm text-slate-200 hover:bg-slate-800">{label}</button>
+}
+
+function MutedBlock({ text }: { text: string }) {
+  return <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-400">{text}</div>
+}
+
+function LoadingCard() {
+  return <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">Loading live OpenClaw snapshot…</div>
 }
 
 export default App
