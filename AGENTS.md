@@ -140,6 +140,7 @@ Skills provide your tools. When you need one, check its `SKILL.md`. Keep local n
 ## Cron Agent Assignment
 
 Follow `CRON_AGENT_ASSIGNMENT.md` before creating or editing cron jobs.
+See `ORG_CHART.md` for the current agent/channel/cron ownership map.
 
 Rule:
 - bind each cron to the specialist agent that actually owns the job

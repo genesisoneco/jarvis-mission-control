@@ -17,6 +17,7 @@ Things like:
 ## Cron Routing Notes
 
 - Follow `CRON_AGENT_ASSIGNMENT.md` when creating or editing cron jobs.
+- See `ORG_CHART.md` for the current channel and agent ownership map.
 - `jensen` = research / analysis cron owner
 - `trinity` = communications / inbox / reports cron owner
 - `elon` = engineering / build / implementation cron owner
