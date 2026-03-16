@@ -14,6 +14,14 @@ Things like:
 - Channel/control-surface notes
 - Anything environment-specific
 
+## Cron Routing Notes
+
+- Follow `CRON_AGENT_ASSIGNMENT.md` when creating or editing cron jobs.
+- `jensen` = research / analysis cron owner
+- `trinity` = communications / inbox / reports cron owner
+- `elon` = engineering / build / implementation cron owner
+- `main` = Jarvis orchestration / routing / approval workers
+
 ## Local Authorization Notes
 
 - Follow `CHANNEL_AUTHORIZATION.md` for trust-tier decisions.
