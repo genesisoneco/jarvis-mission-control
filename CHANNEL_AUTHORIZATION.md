@@ -141,6 +141,8 @@ If a request is sensitive and the channel is not explicitly covered here:
 - webchat direct with Richard: Tier 1
 - Richard's Discord DM with Jarvis: Tier 1
 - Discord channel `1482611310771572921`: Tier 1 private admin/control channel
+- Discord channel `1482916925175763107` (`📡｜ops-comms`): Tier 1 operations/communications control channel
+- Discord channel `1482956598199586928` (`🧠｜research-lab`): Tier 1 research/analysis control channel
 - mirrored Discord `communication` channel: Tier 2
 - all other public/shared Discord channels: Tier 3
 
@@ -156,4 +158,13 @@ If a request is sensitive and the channel is not explicitly covered here:
 - Runtime/admin/config changes are authorized there.
 - Treat it as the preferred Trinity surface for emails, inbox work, reminders, calendar coordination, reports, docs, posts, and other human-facing communication.
 - Email drafts may be prepared there, and approval in that same channel counts as valid authorization for sending the active shown draft unless the action is marked sensitive.
+- Still confirm destructive, ambiguous, irreversible, or secret-exposing actions.
+
+- Discord channel `1482956598199586928` (`🧠｜research-lab`) is Richard's research/analysis control channel.
+- Treat it as Tier 1.
+- Runtime/admin/config changes are authorized there.
+- Treat it as the preferred Jensen surface for research, analysis, comparison, summarization, investigation, trend review, forecasting, strategic review, synthesis of findings, and evidence-based recommendations.
+- In that channel, prefer structured outputs with: Objective, Findings, Analysis, Risks / Unknowns, Recommendation.
+- Do not use it for casual chat, simple execution tasks, or routine system logs unless analytical review is actually needed.
+- If a task elsewhere becomes research-heavy, route it there; if a task there becomes execution-focused, complete the analysis there and hand execution off to the appropriate channel.
 - Still confirm destructive, ambiguous, irreversible, or secret-exposing actions.

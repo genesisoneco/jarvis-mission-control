@@ -22,6 +22,8 @@ Things like:
 - Discord channel `1482611310771572921` = Tier 1 private admin/control channel
 - Discord channel `1482916925175763107` (`📡｜ops-comms`) = Tier 1 operations/communications control channel
 - `📡｜ops-comms` is the preferred Trinity surface for emails, inbox work, reminders, calendar coordination, reports, docs, posts, and other human-facing communication
+- Discord channel `1482956598199586928` (`🧠｜research-lab`) = Tier 1 research/analysis control channel
+- `🧠｜research-lab` is the preferred Jensen surface for research, analysis, comparison, summarization, investigation, trend review, forecasting, strategic review, synthesis, and evidence-based recommendations
 - mirrored Discord `communication` channel = Tier 2
 - other shared/public Discord channels = Tier 3
 - Runtime/admin/config changes are Tier 1 only.
