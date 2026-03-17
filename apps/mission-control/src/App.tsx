@@ -106,6 +106,11 @@ async function logout() {
   window.location.href = `${import.meta.env.BASE_URL}login`
 }
 
+function agentPortrait(name: string) {
+  const slug = name.toLowerCase()
+  return `${import.meta.env.BASE_URL}agents/${slug}.png`
+}
+
 function App() {
   const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ['overview'],
@@ -184,10 +189,23 @@ function App() {
                   <div key={agent.name} className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-14 w-14 items-center justify-center rounded-md bg-gradient-to-br ${agent.avatarClass} text-sm font-semibold tracking-wide text-white shadow-lg shadow-slate-950/40`}
-                        >
-                          {agent.initials}
+                        <div className="h-14 w-14 overflow-hidden rounded-md border border-slate-800 bg-slate-900 shadow-lg shadow-slate-950/40">
+                          <img
+                            src={agentPortrait(agent.name)}
+                            alt={`${agent.name} portrait`}
+                            className="h-full w-full object-cover"
+                            onError={(event) => {
+                              const target = event.currentTarget
+                              target.style.display = 'none'
+                              const fallback = target.nextElementSibling as HTMLDivElement | null
+                              if (fallback) fallback.style.display = 'flex'
+                            }}
+                          />
+                          <div
+                            className={`hidden h-full w-full items-center justify-center bg-gradient-to-br ${agent.avatarClass} text-sm font-semibold tracking-wide text-white`}
+                          >
+                            {agent.initials}
+                          </div>
                         </div>
                         <div>
                           <div className="font-medium text-white">{agent.name}</div>
