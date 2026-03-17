@@ -7,6 +7,10 @@ import './styles.css'
 
 const queryClient = new QueryClient()
 
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload()
+})
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
