@@ -471,6 +471,15 @@ app.get('/api/overview', async (_req, res) => {
             model: activeSessions[0].model,
           }
         : null,
+      reliability: {
+        successRate: 100, // TODO: derive from gateway logs if possible
+        recentFailures: 0,
+        avgLatencyMs: 0,
+      },
+      sessionStats: {
+        active: activeSessions.length,
+        warm: sessions.length - activeSessions.length,
+      }
     }
 
     const automations = jobs.map((job) => ({

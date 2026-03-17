@@ -7,7 +7,22 @@ import './styles.css'
 
 const queryClient = new QueryClient()
 
+window.addEventListener('error', (event) => {
+  if (event.message.includes('Importing a module script failed') || event.message.includes('Loading chunk')) {
+    console.warn('Stale assets detected, performing full reload...', event.message)
+    window.location.reload()
+  }
+})
+
+window.addEventListener('unhandledrejection', (event) => {
+  if (event.reason?.message?.includes('Importing a module script failed') || event.reason?.message?.includes('Loading chunk')) {
+    console.warn('Stale assets detected in promise, performing full reload...', event.reason.message)
+    window.location.reload()
+  }
+})
+
 window.addEventListener('vite:preloadError', () => {
+  console.warn('Vite preload error, performing full reload...')
   window.location.reload()
 })
 

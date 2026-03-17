@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Activity, AlertTriangle, Bot, Clock3, RefreshCw, ShieldAlert, Zap, LogOut, Lock, Cpu, BarChart3, TrendingUp } from 'lucide-react'
+import { Activity, AlertTriangle, Bot, Clock3, RefreshCw, ShieldAlert, Zap, LogOut, Lock, Cpu, BarChart3, TrendingUp, Timer, Coins, Layers } from 'lucide-react'
 
 type Health = 'healthy' | 'warning' | 'critical'
 
@@ -48,6 +48,21 @@ type LLMOverview = {
     tokens: number
     model: string
   } | null
+  reliability?: {
+    successRate: number
+    recentFailures: number
+    avgLatencyMs: number
+  }
+  cacheUsage?: {
+    enabled: boolean
+    hitRate: number
+    savedTokens24h: number
+  }
+  sessionStats?: {
+    active: number
+    warm: number
+  }
+  estimatedCost24h?: number
 }
 
 type RoutingLane = {
@@ -101,7 +116,6 @@ async function fetchOverview(): Promise<OverviewResponse> {
     if (error instanceof Error && error.message.includes('Authentication required')) {
       throw error
     }
-    // fall through to bundled snapshot for hosted preview mode
   }
 
   const fallbackResponse = await fetch(`${import.meta.env.BASE_URL}overview-snapshot.json`)
@@ -181,17 +195,19 @@ function App() {
         ) : null}
 
         {data?.llmOverview ? (
-          <section className="mb-6 grid gap-4 md:grid-cols-3">
-            <div className="flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
-                <Cpu className="h-6 w-6" />
-              </div>
-              <div>
-                <div className="text-xs font-medium uppercase tracking-wider text-slate-500">Active models</div>
-                <div className="flex flex-wrap gap-1.5 mt-1">
+          <>
+            <section className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
+                    <Cpu className="h-5 w-5" />
+                  </div>
+                  <div className="text-xs font-medium uppercase tracking-wider text-slate-500">Active Models</div>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
                   {data.llmOverview.activeModels.length > 0 ? (
                     data.llmOverview.activeModels.map((m) => (
-                      <span key={m} className="rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-medium text-slate-300 border border-slate-700">
+                      <span key={m} className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-300 border border-slate-700">
                         {m}
                       </span>
                     ))
@@ -200,45 +216,104 @@ function App() {
                   )}
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
-                <BarChart3 className="h-6 w-6" />
-              </div>
-              <div className="flex-1">
-                <div className="text-xs font-medium uppercase tracking-wider text-slate-500">24h Token Volume</div>
-                <div className="mt-1 flex items-baseline gap-2">
+              <div className="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+                    <BarChart3 className="h-5 w-5" />
+                  </div>
+                  <div className="text-xs font-medium uppercase tracking-wider text-slate-500">Token Volume (24h)</div>
+                </div>
+                <div className="flex items-baseline justify-between">
                   <div className="text-xl font-semibold text-white">{(data.llmOverview.totalTokens24h / 1000).toFixed(1)}k</div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col items-end">
                     {Object.entries(data.llmOverview.providerBreakdown).map(([p, v]) => (
-                      <span key={p} className="text-[10px] text-slate-500 uppercase">
-                        {p.slice(0,3)}: {(v / 1000).toFixed(1)}k
+                      <span key={p} className="text-[9px] text-slate-500 uppercase leading-tight">
+                        {p}: {(v / 1000).toFixed(1)}k
                       </span>
                     ))}
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
-                <TrendingUp className="h-6 w-6" />
-              </div>
-              <div>
-                <div className="text-xs font-medium uppercase tracking-wider text-slate-500">Hottest Session</div>
+              <div className="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+                    <TrendingUp className="h-5 w-5" />
+                  </div>
+                  <div className="text-xs font-medium uppercase tracking-wider text-slate-500">Hottest Session</div>
+                </div>
                 {data.llmOverview.hottestSession ? (
-                  <div className="mt-1">
-                    <span className="text-sm font-medium text-white">{data.llmOverview.hottestSession.agentId}</span>
-                    <span className="mx-2 text-slate-600">/</span>
-                    <span className="text-xs text-slate-400">{(data.llmOverview.hottestSession.tokens / 1000).toFixed(1)}k tokens</span>
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-white truncate max-w-[120px]">{data.llmOverview.hottestSession.agentId}</span>
+                      <span className="text-[10px] text-slate-500 uppercase">{data.llmOverview.hottestSession.model}</span>
+                    </div>
+                    <div className="text-[11px] text-slate-400">
+                      {(data.llmOverview.hottestSession.tokens / 1000).toFixed(1)}k tokens · ID: {data.llmOverview.hottestSession.id.slice(0, 8)}
+                    </div>
                   </div>
                 ) : (
-                  <div className="mt-1 text-sm text-slate-400">No active sessions</div>
+                  <div className="text-sm text-slate-400">No active sessions</div>
                 )}
               </div>
-            </div>
-          </section>
+
+              <div className="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/10 text-rose-400">
+                    <Activity className="h-5 w-5" />
+                  </div>
+                  <div className="text-xs font-medium uppercase tracking-wider text-slate-500">Performance</div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <div className="text-[9px] text-slate-500 uppercase">Latency</div>
+                    <div className="text-sm font-medium text-white">{data.llmOverview.reliability?.avgLatencyMs ?? '—'}ms</div>
+                  </div>
+                  <div>
+                    <div className="text-[9px] text-slate-500 uppercase">Success</div>
+                    <div className={`text-sm font-medium ${data.llmOverview.reliability?.successRate && data.llmOverview.reliability.successRate < 95 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                      {data.llmOverview.reliability?.successRate ?? '—'}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {data.llmOverview.estimatedCost24h !== undefined || data.llmOverview.cacheUsage || data.llmOverview.sessionStats ? (
+              <div className="mb-6 grid gap-4 md:grid-cols-3">
+                {data.llmOverview.estimatedCost24h !== undefined && (
+                  <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/30 px-4 py-2">
+                    <div className="flex items-center gap-2">
+                      <Coins className="h-3.5 w-3.5 text-slate-500" />
+                      <span className="text-[11px] font-medium uppercase tracking-wider text-slate-500">Est. 24h Cost</span>
+                    </div>
+                    <span className="text-sm font-semibold text-slate-200">${data.llmOverview.estimatedCost24h.toFixed(2)}</span>
+                  </div>
+                )}
+                {data.llmOverview.cacheUsage && (
+                  <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/30 px-4 py-2">
+                    <div className="flex items-center gap-2">
+                      <Layers className="h-3.5 w-3.5 text-slate-500" />
+                      <span className="text-[11px] font-medium uppercase tracking-wider text-slate-500">Cache Hit Rate</span>
+                    </div>
+                    <span className="text-sm font-semibold text-emerald-400">{(data.llmOverview.cacheUsage.hitRate * 100).toFixed(0)}%</span>
+                  </div>
+                )}
+                {data.llmOverview.sessionStats && (
+                  <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/30 px-4 py-2">
+                    <div className="flex items-center gap-2">
+                      <Timer className="h-3.5 w-3.5 text-slate-500" />
+                      <span className="text-[11px] font-medium uppercase tracking-wider text-slate-500">Sessions</span>
+                    </div>
+                    <span className="text-sm font-semibold text-slate-200">
+                      {data.llmOverview.sessionStats.active} active <span className="text-slate-600 mx-1">/</span> {data.llmOverview.sessionStats.warm} warm
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : null}
+          </>
         ) : null}
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -378,7 +453,7 @@ function Panel({ title, icon, children }: { title: string; icon: React.ReactNode
   )
 }
 
-function AttentionCard({ title, detail }: AttentionItemType) {
+function AttentionCard({ title, detail }: { title: string; detail: string }) {
   return (
     <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
       <div className="font-medium text-amber-200">{title}</div>
