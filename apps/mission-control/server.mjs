@@ -231,36 +231,114 @@ async function findLatestOpenClawLog() {
   return stats[0]?.fullPath ?? null
 }
 
+function stripAnsi(value) {
+  return String(value)
+    .replace(/\u001b\[[0-9;]*m/g, '')
+    .replace(/\x1B\[[0-9;]*m/g, '')
+    .replace(/\[[0-9;]*m/g, '')
+    .replace(/\[\d+m/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function summarizeLogEvent(text) {
+  const clean = stripAnsi(text)
+  const lower = clean.toLowerCase()
+
+  if (lower.includes('missing scope') && lower.includes('operator.read')) {
+    return {
+      key: 'missing-operator-read-scope',
+      severity: 'warning',
+      title: 'Operator API auth scope missing',
+      detail: 'Mission Control cannot read some live runtime data because operator.read scope is missing.',
+    }
+  }
+
+  if (lower.includes('handshake timeout')) {
+    return {
+      key: 'channel-handshake-timeout',
+      severity: 'warning',
+      title: 'Channel handshake timed out',
+      detail: 'A channel connection or auth handshake timed out. Live channel data may be delayed until it reconnects.',
+    }
+  }
+
+  if (lower.includes('health-monitor: restarting')) {
+    return {
+      key: 'health-monitor-restarting',
+      severity: 'warning',
+      title: 'Health monitor restarted a service',
+      detail: 'OpenClaw detected an unhealthy component and restarted it automatically.',
+    }
+  }
+
+  if (lower.includes('logged in to discord')) {
+    return {
+      key: 'discord-login-ok',
+      severity: 'healthy',
+      title: 'Discord connection restored',
+      detail: 'The Discord client logged in successfully and is connected again.',
+    }
+  }
+
+  if (lower.includes('deploy-commands:done')) {
+    return {
+      key: 'discord-commands-deployed',
+      severity: 'healthy',
+      title: 'Discord commands deployed',
+      detail: 'Discord application commands finished deploying successfully.',
+    }
+  }
+
+  if (lower.includes('critical')) {
+    return {
+      key: `critical-${lower.slice(0, 40)}`,
+      severity: 'critical',
+      title: 'Critical runtime issue detected',
+      detail: clean,
+    }
+  }
+
+  if (lower.includes('error')) {
+    return {
+      key: `error-${lower.slice(0, 40)}`,
+      severity: 'warning',
+      title: 'Runtime warning',
+      detail: clean,
+    }
+  }
+
+  return null
+}
+
 function parseLogEvents(lines) {
   const events = []
+  const seen = new Set()
+
   for (const line of lines) {
     if (!line.trim()) continue
     try {
       const entry = JSON.parse(line)
       const text = [entry['1'], entry['2']].filter(Boolean).join(' ')
+      const summary = summarizeLogEvent(text)
+      if (!summary) continue
+
       const time = typeof entry.time === 'string' ? entry.time.slice(11, 16) : '--:--'
-      const lower = text.toLowerCase()
-      let severity = 'healthy'
-      if (lower.includes('missing scope') || lower.includes('handshake timeout') || lower.includes('error')) severity = 'warning'
-      if (lower.includes('critical')) severity = 'critical'
-      if (
-        lower.includes('missing scope') ||
-        lower.includes('handshake timeout') ||
-        lower.includes('health-monitor: restarting') ||
-        lower.includes('logged in to discord') ||
-        lower.includes('deploy-commands:done')
-      ) {
-        events.push({
-          time,
-          severity,
-          title: text.split(' ').slice(0, 8).join(' '),
-          detail: text,
-        })
-      }
+      const dedupeKey = `${summary.key}:${summary.title}`
+      if (seen.has(dedupeKey)) continue
+      seen.add(dedupeKey)
+
+      events.push({
+        time,
+        severity: summary.severity,
+        title: summary.title,
+        detail: summary.detail,
+      })
     } catch {
       // ignore non-JSON lines
     }
   }
+
   return events.slice(-8).reverse()
 }
 
