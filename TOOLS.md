@@ -23,6 +23,12 @@ Things like:
 - `elon` = engineering / build / implementation cron owner
 - `main` = Jarvis orchestration / routing / approval workers
 
+## Continuity Notes
+
+- Canonical short-term state lives in `C:\Users\Richard Yoon\.openclaw\workspace\NOW.md`
+- Canonical active project checkpoints live in `C:\Users\Richard Yoon\.openclaw\workspace\status\*.md`
+- Prefer these over transcript archaeology when reconstructing active work status
+
 ## Local Authorization Notes
 
 - Follow `CHANNEL_AUTHORIZATION.md` for trust-tier decisions.

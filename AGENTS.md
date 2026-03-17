@@ -137,6 +137,13 @@ Reactions are lightweight social signals. Humans use them constantly — they sa
 
 Skills provide your tools. When you need one, check its `SKILL.md`. Keep local notes (camera names, SSH details, voice preferences) in `TOOLS.md`.
 
+## Active Status Discipline
+
+- Use `C:\Users\Richard Yoon\.openclaw\workspace\NOW.md` as Jarvis's short current-state snapshot
+- Use `C:\Users\Richard Yoon\.openclaw\workspace\status\*.md` as the canonical active project checkpoints
+- Update relevant status files on meaningful progress, handoff, pause, or blocker changes
+- Keep status files concise and operational, not diary-like
+
 ## Cron Agent Assignment
 
 Follow `CRON_AGENT_ASSIGNMENT.md` before creating or editing cron jobs.
