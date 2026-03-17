@@ -272,6 +272,42 @@ function summarizeLogEvent(text) {
     }
   }
 
+  if (lower.includes('eperm') && lower.includes('rename') && lower.includes('pending.json')) {
+    return {
+      key: 'device-pending-file-lock',
+      severity: 'warning',
+      title: 'Device state file update failed',
+      detail: 'Windows blocked an update to the pending device-state file. Pairing or device status may be temporarily stale until the next successful write.',
+    }
+  }
+
+  if (lower.includes('failovererror') && lower.includes('llm request timed out')) {
+    return {
+      key: 'llm-request-timeout',
+      severity: 'warning',
+      title: 'Model request timed out',
+      detail: 'An agent task exceeded the LLM timeout window. Some automation results may be delayed, retried, or incomplete.',
+    }
+  }
+
+  if (lower.includes('lane task error')) {
+    return {
+      key: 'agent-lane-task-error',
+      severity: 'warning',
+      title: 'Agent lane task failed',
+      detail: 'A routed agent task hit an execution error. Check the related agent/session if this keeps repeating.',
+    }
+  }
+
+  if (lower.includes('cron: applying error backoff')) {
+    return {
+      key: 'cron-error-backoff',
+      severity: 'warning',
+      title: 'Scheduled job entered backoff',
+      detail: 'A cron routine hit repeated errors, so OpenClaw increased the delay before the next retry.',
+    }
+  }
+
   if (lower.includes('logged in to discord')) {
     return {
       key: 'discord-login-ok',
@@ -295,7 +331,7 @@ function summarizeLogEvent(text) {
       key: `critical-${lower.slice(0, 40)}`,
       severity: 'critical',
       title: 'Critical runtime issue detected',
-      detail: clean,
+      detail: 'OpenClaw reported a critical runtime problem. Inspect the affected component if the issue persists.',
     }
   }
 
@@ -304,7 +340,7 @@ function summarizeLogEvent(text) {
       key: `error-${lower.slice(0, 40)}`,
       severity: 'warning',
       title: 'Runtime warning',
-      detail: clean,
+      detail: 'OpenClaw logged a warning/error event that may need follow-up if it repeats.',
     }
   }
 
