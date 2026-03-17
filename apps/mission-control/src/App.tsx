@@ -125,8 +125,8 @@ function App() {
       <div className="mx-auto max-w-7xl px-6 py-8">
         <header className="mb-8 flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-2xl shadow-slate-950/40 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="mb-2 text-xs uppercase tracking-[0.3em] text-cyan-300">Jarvis Mission Control</p>
-            <h1 className="text-3xl font-semibold text-white">Operator dashboard for OpenClaw</h1>
+            <p className="mb-2 text-xs uppercase tracking-[0.3em] text-cyan-300">Richard's Enterprise Dashboard</p>
+            <h1 className="text-3xl font-semibold text-white">Jarvis Mission Control</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-400">
               Live signal view of health, agents, automations, and intervention points. Built for fast decisions, not dashboard theater.
             </p>
