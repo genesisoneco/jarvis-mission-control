@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Activity, AlertTriangle, Bot, Clock3, RefreshCw, ShieldAlert, Zap, LogOut, Lock } from 'lucide-react'
+import { Activity, AlertTriangle, Bot, Clock3, RefreshCw, ShieldAlert, Zap, LogOut, Lock, Cpu, BarChart3, TrendingUp } from 'lucide-react'
 
 type Health = 'healthy' | 'warning' | 'critical'
 
@@ -38,6 +38,18 @@ type AutomationItem = {
   detail: string
 }
 
+type LLMOverview = {
+  activeModels: string[]
+  totalTokens24h: number
+  providerBreakdown: Record<string, number>
+  hottestSession: {
+    id: string
+    agentId: string
+    tokens: number
+    model: string
+  } | null
+}
+
 type RoutingLane = {
   description: string
   modelOrder: string[]
@@ -51,6 +63,7 @@ type OverviewResponse = {
   agents: AgentItem[]
   attention: AttentionItemType[]
   automations: AutomationItem[]
+  llmOverview?: LLMOverview
   auth?: {
     required: boolean
     via: string
@@ -165,6 +178,67 @@ function App() {
           <div className="mb-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
             {(error as Error).message}
           </div>
+        ) : null}
+
+        {data?.llmOverview ? (
+          <section className="mb-6 grid gap-4 md:grid-cols-3">
+            <div className="flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
+                <Cpu className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="text-xs font-medium uppercase tracking-wider text-slate-500">Active models</div>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {data.llmOverview.activeModels.length > 0 ? (
+                    data.llmOverview.activeModels.map((m) => (
+                      <span key={m} className="rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-medium text-slate-300 border border-slate-700">
+                        {m}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-sm text-slate-400">None active</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+                <BarChart3 className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <div className="text-xs font-medium uppercase tracking-wider text-slate-500">24h Token Volume</div>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <div className="text-xl font-semibold text-white">{(data.llmOverview.totalTokens24h / 1000).toFixed(1)}k</div>
+                  <div className="flex gap-2">
+                    {Object.entries(data.llmOverview.providerBreakdown).map(([p, v]) => (
+                      <span key={p} className="text-[10px] text-slate-500 uppercase">
+                        {p.slice(0,3)}: {(v / 1000).toFixed(1)}k
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+                <TrendingUp className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="text-xs font-medium uppercase tracking-wider text-slate-500">Hottest Session</div>
+                {data.llmOverview.hottestSession ? (
+                  <div className="mt-1">
+                    <span className="text-sm font-medium text-white">{data.llmOverview.hottestSession.agentId}</span>
+                    <span className="mx-2 text-slate-600">/</span>
+                    <span className="text-xs text-slate-400">{(data.llmOverview.hottestSession.tokens / 1000).toFixed(1)}k tokens</span>
+                  </div>
+                ) : (
+                  <div className="mt-1 text-sm text-slate-400">No active sessions</div>
+                )}
+              </div>
+            </div>
+          </section>
         ) : null}
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

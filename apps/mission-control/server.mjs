@@ -454,6 +454,25 @@ app.get('/api/overview', async (_req, res) => {
       }
     })
 
+    const llmOverview = {
+      activeModels: [...new Set(activeSessions.map((s) => s.model))].filter(Boolean),
+      totalTokens24h: sessions.reduce((acc, s) => acc + (s.totalTokens || 0), 0),
+      providerBreakdown: sessions.reduce((acc, s) => {
+        if (s.modelProvider) {
+          acc[s.modelProvider] = (acc[s.modelProvider] || 0) + (s.totalTokens || 0)
+        }
+        return acc
+      }, {}),
+      hottestSession: activeSessions[0]
+        ? {
+            id: activeSessions[0].sessionId,
+            agentId: activeSessions[0].agentId,
+            tokens: activeSessions[0].totalTokens,
+            model: activeSessions[0].model,
+          }
+        : null,
+    }
+
     const automations = jobs.map((job) => ({
       name: job.name,
       state:
@@ -512,6 +531,7 @@ app.get('/api/overview', async (_req, res) => {
       events,
       attention,
       automations,
+      llmOverview,
       auth: {
         required: Boolean(accessToken),
         via: accessToken ? 'token-or-cookie' : 'loopback-only',
