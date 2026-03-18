@@ -38,20 +38,38 @@
     {
       "name": "Jarvis",
       "state": "Preview",
-      "model": "n/a",
-      "focus": "Operator orchestration",
+      "model": "gpt-5.4",
+      "focus": "Command orchestration",
       "initials": "JV",
       "avatarClass": "from-cyan-500 to-blue-600",
-      "note": "Live activity requires the local adapter API."
+      "note": "Top-level orchestrator for routing, approvals, verification, and synthesis."
     },
     {
       "name": "Elon",
       "state": "Preview",
-      "model": "Mission Control update lane",
+      "model": "gemini-flash / gpt-5.4",
       "focus": "Engineering tasks",
       "initials": "EL",
       "avatarClass": "from-amber-400 to-orange-600",
-      "note": "Mission Control update work routes Qwen → Gemini Flash → OpenAI."
+      "note": "Engineering specialist for implementation, debugging, and build execution."
+    },
+    {
+      "name": "Jensen",
+      "state": "Preview",
+      "model": "gemini-flash",
+      "focus": "Research and analysis",
+      "initials": "JN",
+      "avatarClass": "from-emerald-400 to-teal-600",
+      "note": "Research specialist for analysis, investigation, synthesis, and evidence-backed recommendations."
+    },
+    {
+      "name": "Trinity",
+      "state": "Preview",
+      "model": "gemini-flash / gpt-5.4",
+      "focus": "Communications and coordination",
+      "initials": "TR",
+      "avatarClass": "from-fuchsia-400 to-pink-600",
+      "note": "Communications specialist for inbox, calendar, docs, reminders, and human-facing coordination."
     }
   ],
   "attention": [

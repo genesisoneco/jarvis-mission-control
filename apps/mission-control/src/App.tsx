@@ -138,6 +138,17 @@ function agentPortrait(name: string) {
   return `${import.meta.env.BASE_URL}agents/${slug}.png`
 }
 
+function agentPortraitClass(name: string) {
+  const slug = name.toLowerCase()
+  const map: Record<string, string> = {
+    jarvis: 'scale-[1.08] object-center',
+    elon: 'scale-[1.18] object-center',
+    jensen: 'scale-[1.10] object-center',
+    trinity: 'scale-[1.10] object-center',
+  }
+  return map[slug] ?? 'scale-[1.10] object-center'
+}
+
 function App() {
   const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ['overview'],
