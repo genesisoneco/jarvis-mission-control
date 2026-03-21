@@ -35,7 +35,7 @@ jobs:
         run: npm ci
 
       - name: Build app
-        run: npm run build
+        run: npm run build:pages
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
