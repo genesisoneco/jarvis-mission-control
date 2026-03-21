@@ -180,13 +180,28 @@ function formatRelativeMs(ageMs) {
   return `${days}d ago`
 }
 
-function inferAgentState(agentId, sessions) {
-  const recent = sessions.filter((session) => session.agentId === agentId)
-  if (recent.length === 0) return 'Idle'
-  const freshest = recent[0]
-  if (freshest.ageMs < 10 * 60 * 1000) return 'Active'
-  if (freshest.ageMs < 60 * 60 * 1000) return 'Warm'
-  return 'Idle'
+function keySegments(session) {
+  return String(session?.key || '')
+    .split(':')
+    .map((part) => part.trim())
+    .filter(Boolean)
+}
+
+function humanizeKeySegment(value) {
+  const normalized = String(value || '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/\bdiscord\b/gi, 'Discord')
+    .replace(/\bcron\b/gi, 'scheduled')
+    .replace(/\bsubagent\b/gi, 'subagent')
+    .trim()
+  if (!normalized) return null
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1)
+}
+
+function compactSessionText(value, fallback = null) {
+  const normalized = typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''
+  if (!normalized) return fallback
+  return normalized.length > 96 ? `${normalized.slice(0, 93).trimEnd()}…` : normalized
 }
 
 function prettyAgentName(agentId) {
@@ -207,6 +222,187 @@ function avatarClassForAgent(agentId) {
     trinity: 'from-fuchsia-400 to-pink-600',
   }
   return map[agentId] || 'from-slate-500 to-slate-700'
+}
+
+function deriveSessionShortLabel(session) {
+  const explicit = compactSessionText(session?.label || session?.displayName, null)
+  if (explicit) return explicit
+
+  const segments = keySegments(session)
+  if (segments.includes('discord') && segments.includes('channel')) {
+    const channelId = segments[segments.indexOf('channel') + 1]
+    return channelId ? `Discord channel ${channelId}` : 'Discord channel'
+  }
+  if (segments.includes('cron')) return 'Scheduled run'
+  if (segments.includes('subagent')) return 'Subagent task'
+  return null
+}
+
+function deriveSessionTaskSummary(session) {
+  const explicit = deriveSessionShortLabel(session)
+  if (explicit) return explicit
+  if (typeof session?.kind === 'string' && session.kind.trim()) return compactSessionText(`${session.kind} session`, null)
+
+  const segments = keySegments(session)
+  if (segments.includes('discord') && segments.includes('channel')) return 'Channel coordination'
+  if (segments.includes('cron')) return 'Scheduled automation'
+  if (segments.includes('subagent')) return 'Delegated subagent work'
+  return null
+}
+
+function deriveSessionKeyLabel(session) {
+  const segments = keySegments(session)
+  if (segments.length === 0) return null
+  if (segments.includes('discord') && segments.includes('channel')) return 'Session key indicates Discord channel runtime'
+  if (segments.includes('cron')) return 'Session key indicates scheduled runtime'
+  if (segments.includes('subagent')) return 'Session key indicates delegated subagent runtime'
+  if (segments.includes('main')) return 'Primary direct runtime session'
+  const tail = humanizeKeySegment(segments[segments.length - 1])
+  return tail ? `${tail} runtime session` : null
+}
+
+function hasRuntimePulse(session) {
+  return Boolean(
+    session?.totalTokensFresh
+      || session?.systemSent
+      || session?.thinkingLevel
+      || (session?.flags?.length ?? 0) > 0
+      || (session?.percentUsed ?? 0) >= 20
+      || (session?.totalTokens ?? 0) >= 1200,
+  )
+}
+
+function buildSessionGraph(baseSessions, activeSessionKeys = new Set()) {
+  const byKey = new Map(baseSessions.map((session) => [session.key, session]))
+  const childrenByParent = new Map()
+
+  for (const session of baseSessions) {
+    if (typeof session?.spawnedBy !== 'string' || !session.spawnedBy) continue
+    const children = childrenByParent.get(session.spawnedBy) ?? []
+    children.push(session)
+    childrenByParent.set(session.spawnedBy, children)
+  }
+
+  const sessions = baseSessions.map((session) => {
+    const parent = typeof session?.spawnedBy === 'string' ? byKey.get(session.spawnedBy) : null
+    const children = childrenByParent.get(session.key) ?? []
+    const ageMs = typeof session?.ageMs === 'number' ? session.ageMs : Number.MAX_SAFE_INTEGER
+    const keyLabel = deriveSessionKeyLabel(session)
+    const shortLabel = deriveSessionShortLabel(session) || keyLabel
+    const taskSummary = deriveSessionTaskSummary(session) || keyLabel
+    const runtimePulse = hasRuntimePulse(session)
+
+    let collaboration = null
+    if (parent) {
+      collaboration = {
+        linkedSessionKey: parent.key,
+        linkedAgentId: parent.agentId,
+        relation: 'child',
+        sharedTask: shortLabel || deriveSessionShortLabel(parent) || deriveSessionTaskSummary(parent) || null,
+        source: session.label
+          ? 'Explicit child session label plus spawnedBy lineage from OpenClaw.'
+          : 'Explicit spawnedBy lineage from OpenClaw session metadata.',
+        confidence: 'high',
+      }
+    } else if (children.length > 0) {
+      const freshestChild = [...children].sort((a, b) => (a.ageMs ?? Number.MAX_SAFE_INTEGER) - (b.ageMs ?? Number.MAX_SAFE_INTEGER))[0]
+      collaboration = {
+        linkedSessionKey: freshestChild.key,
+        linkedAgentId: freshestChild.agentId,
+        relation: 'parent',
+        sharedTask: deriveSessionShortLabel(freshestChild) || deriveSessionTaskSummary(freshestChild) || taskSummary || null,
+        source: 'Explicit spawnedBy lineage from OpenClaw session metadata.',
+        confidence: 'high',
+      }
+    }
+
+    let activityState = 'idle'
+    let activityLabel = 'Idle'
+    let activitySource = 'Session freshness exceeded the active/cooldown windows.'
+    let activityConfidence = 'high'
+
+    if (session?.abortedLastRun) {
+      activityState = 'blocked'
+      activityLabel = 'Blocked'
+      activitySource = 'Explicit abortedLastRun signal from OpenClaw session metadata.'
+    } else if (collaboration && (activeSessionKeys.has(session.key) || ageMs < 25 * 60 * 1000)) {
+      activityState = 'collaborating'
+      activityLabel = 'Collaborating'
+      activitySource = collaboration.source
+    } else if (activeSessionKeys.has(session.key) && runtimePulse) {
+      activityState = 'executing'
+      activityLabel = 'Executing'
+      activitySource = 'Explicit allActive membership plus runtime pulse signals.'
+    } else if (activeSessionKeys.has(session.key)) {
+      activityState = 'waiting_input'
+      activityLabel = 'Waiting for input'
+      activitySource = 'Explicit allActive membership without a concurrent runtime pulse.'
+      activityConfidence = 'medium'
+    } else if (ageMs < 12 * 60 * 1000 && runtimePulse) {
+      activityState = 'executing'
+      activityLabel = 'Executing'
+      activitySource = 'Fresh runtime pulse signals on the session without an active-session flag.'
+      activityConfidence = 'medium'
+    } else if (ageMs < 90 * 60 * 1000) {
+      activityState = 'cooldown'
+      activityLabel = 'Cooling down'
+      activitySource = 'Recent runtime session is inside the cooldown window.'
+      activityConfidence = 'medium'
+    }
+
+    return {
+      ...session,
+      shortLabel,
+      taskSummary,
+      taskSummarySource: session?.label || session?.displayName ? 'explicit-session-label' : keyLabel ? 'session-key-derivation' : 'session-kind-fallback',
+      explicitActivityState: activityState,
+      explicitActivityLabel: activityLabel,
+      explicitActivitySource: activitySource,
+      explicitActivityConfidence: activityConfidence,
+      collaboration,
+    }
+  })
+
+  const collaborationLinks = sessions
+    .map((session) => {
+      const context = session.collaboration
+      if (!context || context.relation !== 'child') return null
+      const parent = byKey.get(context.linkedSessionKey)
+      if (!parent) return null
+      const childAgeMs = typeof session?.ageMs === 'number' ? session.ageMs : Number.MAX_SAFE_INTEGER
+      const parentAgeMs = typeof parent?.ageMs === 'number' ? parent.ageMs : Number.MAX_SAFE_INTEGER
+      return {
+        fromAgentId: parent.agentId,
+        toAgentId: session.agentId,
+        fromSessionKey: parent.key,
+        toSessionKey: session.key,
+        sharedTask: context.sharedTask,
+        reason: context.source,
+        mode: 'delegation',
+        explicit: true,
+        ageGapMs: Math.abs(childAgeMs - parentAgeMs),
+        confidence: context.confidence,
+      }
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.ageGapMs - b.ageGapMs)
+    .slice(0, 6)
+
+  return { sessions, collaborationLinks }
+}
+
+function inferAgentState(agentId, sessions, activeSessionKeys = new Set()) {
+  const recent = sessions.filter((session) => session.agentId === agentId)
+  if (recent.length === 0) return 'Idle'
+  const freshest = recent[0]
+  const explicit = freshest.explicitActivityState
+  if (explicit === 'blocked') return 'Blocked'
+  if (explicit === 'collaborating') return 'Collaborating'
+  if (explicit === 'executing') return 'Active'
+  if (explicit === 'waiting_input') return 'Waiting'
+  if (explicit === 'cooldown') return 'Warm'
+  if (activeSessionKeys.has(freshest.key)) return 'Active'
+  return 'Idle'
 }
 
 async function readCronJobs() {
@@ -369,6 +565,7 @@ function parseLogEvents(lines) {
         severity: summary.severity,
         title: summary.title,
         detail: summary.detail,
+        scope: 'ambient',
       })
     } catch {
       // ignore non-JSON lines
@@ -421,7 +618,7 @@ app.get('/api/overview', async (_req, res) => {
       findLatestOpenClawLog(),
     ])
 
-    const sessions = Array.isArray(sessionsResult?.sessions) ? sessionsResult.sessions : []
+    const baseSessions = Array.isArray(sessionsResult?.sessions) ? sessionsResult.sessions : []
     const jobs = Array.isArray(cronJobsStore?.jobs) ? cronJobsStore.jobs : []
     const logLines = latestLogPath ? (await fs.readFile(latestLogPath, 'utf8')).trim().split(/\r?\n/).slice(-250) : []
     const events = parseLogEvents(logLines)
@@ -429,7 +626,9 @@ app.get('/api/overview', async (_req, res) => {
     const gatewayReachable = Boolean(gatewayStatus?.rpc?.ok)
     const scopeIssue = logLines.some((line) => line.includes('missing scope: operator.read'))
     const disconnectedChannels = Object.values(health?.channels || {}).filter((channel) => channel?.configured && !channel?.running).length
-    const activeSessions = sessions.filter((session) => session.ageMs < 60 * 60 * 1000)
+    const activeSessionKeys = new Set((status?.sessions?.allActive || []).map((session) => session.key))
+    const { sessions, collaborationLinks } = buildSessionGraph(baseSessions, activeSessionKeys)
+    const activeSessions = sessions.filter((session) => activeSessionKeys.has(session.key) || session.ageMs < 60 * 60 * 1000)
     const failingJobs = jobs.filter((job) => (job.state?.consecutiveErrors || 0) > 0 || job.state?.lastStatus === 'error')
 
     const agentIds = ['operator', 'elon', 'jensen', 'trinity']
@@ -438,7 +637,7 @@ app.get('/api/overview', async (_req, res) => {
       const freshest = agentSessions[0]
       return {
         name: prettyAgentName(agentId === 'operator' ? 'Jarvis' : agentId),
-        state: inferAgentState(agentId, sessions),
+        state: inferAgentState(agentId, sessions, activeSessionKeys),
         model: freshest?.model || 'n/a',
         focus:
           agentId === 'operator'
@@ -548,6 +747,10 @@ app.get('/api/overview', async (_req, res) => {
       },
       raw: {
         status,
+        sessions: {
+          sessions,
+          collaborations: collaborationLinks,
+        },
         gatewayStatus,
         health,
         routingPolicy,

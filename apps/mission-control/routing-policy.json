@@ -7,12 +7,22 @@
     },
     "missionControlUpdate": {
       "description": "Mission Control maintenance, low-complexity updates, progress pushes, routine UI iteration, and light refactors.",
-      "modelOrder": ["qwen", "gemini-flash", "openai"],
+      "modelOrder": ["llama3.2:3b", "qwen", "gemini-flash", "openai"],
       "escalateWhen": [
         "architecture changes",
         "critical debugging",
         "risky refactors",
         "substantial implementation work"
+      ]
+    },
+    "localGruntWork": {
+      "description": "Ultra-cheap local lane for triage, repetitive extraction, rough first-pass drafting, lightweight summarization, and helper-agent grunt work.",
+      "modelOrder": ["llama3.2:3b", "qwen", "gemini-flash", "openai"],
+      "escalateWhen": [
+        "final answer quality matters",
+        "subtle reasoning is required",
+        "architecture or debugging depth is required",
+        "high-risk or high-confidence decisions are needed"
       ]
     }
   }

@@ -6,6 +6,14 @@ Mission Control is a focused operator dashboard for monitoring Jarvis/OpenClaw h
 - GitHub Pages still exists as a static UI preview.
 - The local Express adapter now doubles as the **private live host** for the built dashboard.
 - Live runtime data stays on Richard's machine and is exposed only through the local adapter.
+- The overview now includes **virtual workspace v2**: a living 2D office sim with moving agent characters, distinct zones (command desk, engineering bay, research corner, comms desk, meeting area, alert wall, break area), runtime-driven movement targets when signals are available, and fallback demo motion when live data is sparse.
+
+## Virtual workspace v2
+- The simulation layer lives in `src/components/VirtualWorkspace.tsx`.
+- Jarvis, Elon, Jensen, and Trinity now move from a more explicit truth layer exposed by `server.mjs`: session-derived `explicitActivityState`, `explicitActivityLabel`, `explicitActivitySource`, `explicitActivityConfidence`, task-summary provenance, and spawned-session collaboration context.
+- Clicking an agent focuses its current office position, state, nearby signals, runtime/task readout, and the truth/source note that drove the current embodiment.
+- The office also reacts lightly to runtime state now: collaboration brightens the shared room, blocked work warms the alert wall, and engaged props (screens, boards, coffee, servers) animate subtly without turning the dashboard into noise.
+- The rest of Mission Control remains the same operational dashboard around the sim.
 
 ## Modes
 
@@ -15,10 +23,14 @@ Useful for UI review only.
 ```powershell
 cd apps/mission-control
 npm install
-npm run build
+npm run build:pages
 ```
 
-The GitHub Pages deploy uses `VITE_BASE_PATH=/jarvis-mission-control/` and falls back to `public/overview-snapshot.json`.
+The GitHub Pages deploy uses `/jarvis-mission-control/` and falls back to `public/overview-snapshot.json`.
+
+### Build defaults
+- `npm run build` and `npm run build:live` now target the local live host (`/`) so `http://127.0.0.1:8787/` works correctly.
+- Use `npm run build:pages` only for the GitHub Pages/static preview path.
 
 ### 2) Local live mode
 Useful for live runtime state on the same machine.

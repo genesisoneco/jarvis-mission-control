@@ -7,7 +7,9 @@
     "dev": "concurrently \"npm:dev:api\" \"npm:dev:web\"",
     "dev:web": "vite",
     "dev:api": "node server.mjs",
-    "build": "tsc -b && vite build",
+    "build": "npm run build:live",
+    "build:live": "tsc -b && vite build",
+    "build:pages": "tsc -b && vite build --base=/jarvis-mission-control/",
     "start": "node server.mjs",
     "preview": "vite preview"
   },

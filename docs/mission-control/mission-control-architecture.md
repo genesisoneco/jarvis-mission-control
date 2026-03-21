@@ -124,6 +124,13 @@ Preferred path for MVP:
 - `EventFeed`
 - `QuickActionsPanel`
 - `AttentionQueue`
+- `VirtualWorkspace` (living office sim layer)
+
+## Virtual workspace v2 notes
+- Mission Control now has a dedicated simulation component for the office scene instead of embedding a mostly card-based workspace block directly in `App.tsx`.
+- The scene is lightweight browser UI (React + CSS), not a heavy game engine.
+- Agent movement targets are inferred from recent runtime/session evidence first, then fall back to deterministic ambient/demo behavior so the room still feels alive with sparse data.
+- Zones currently include command desk, engineering bay, research corner, comms desk, meeting area, alert wall, and break area.
 
 ## Suggested File Structure
 
