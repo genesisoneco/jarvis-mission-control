@@ -53,6 +53,15 @@ type AutomationItem = {
   detail: string
 }
 
+type AgentStatus = {
+  agent: string
+  activity: string
+  workspaceArea?: string | null
+  task?: string | null
+  startedAt?: string | null
+  updatedAt?: string | null
+}
+
 type RawSession = {
   agentId: string
   key: string
@@ -311,6 +320,22 @@ function workloadProfile(session: RawSession | null, presence: Presence): { labe
   if (percentUsed >= 60 || totalTokens >= 45_000) return { label: 'High active load', tone: 'warning' }
   if (presence === 'active' || presence === 'warm') return { label: 'Light active load', tone: 'healthy' }
   return { label: 'Standing by cleanly', tone: 'healthy' }
+}
+
+async function fetchAgentStatus(): Promise<AgentStatus[]> {
+  const apiUrl = `${import.meta.env.BASE_URL}api/agent-status`
+
+  try {
+    const response = await fetch(apiUrl, { credentials: 'include' })
+    if (response.ok) {
+      const json = await response.json()
+      return Array.isArray(json.agents) ? (json.agents as AgentStatus[]) : []
+    }
+  } catch {
+    // ignore status errors; fall back to empty list
+  }
+
+  return []
 }
 
 function truthLabelForAgent(agent: Pick<WorkspaceAgent, 'presence' | 'activityLabel' | 'activityConfidence'>, data: OverviewResponse) {
@@ -755,6 +780,12 @@ function App() {
     refetchInterval: 30000,
   })
 
+  const { data: agentStatus } = useQuery({
+    queryKey: ['agent-status'],
+    queryFn: fetchAgentStatus,
+    refetchInterval: 15000,
+  })
+
   const isLive = Boolean(data?.auth)
   const { workspaceAgents, handoffs } = useMemo(() => (data ? deriveWorkspace(data) : { workspaceAgents: [], handoffs: [] }), [data])
   const [selectedAgentId, setSelectedAgentId] = useState<string>('jarvis')
@@ -793,6 +824,30 @@ function App() {
         </header>
 
         {error ? <div className="mb-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">{(error as Error).message}</div> : null}
+
+        {agentStatus && agentStatus.length > 0 ? (
+          <section className="mb-6 rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-sm text-slate-300">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-emerald-400" />
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Current agent work</span>
+              </div>
+              <span className="text-[10px] uppercase tracking-wide text-slate-500">Live status from workspace/status</span>
+            </div>
+            <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
+              {agentStatus.map((s) => (
+                <div key={s.agent} className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold text-slate-200">{s.agent}</span>
+                    {s.workspaceArea ? <span className="text-[10px] uppercase tracking-wide text-slate-500">{s.workspaceArea}</span> : null}
+                  </div>
+                  <div className="mt-1 text-xs text-slate-300">{s.activity}</div>
+                  {s.task ? <div className="mt-0.5 text-[11px] text-slate-500">{s.task}</div> : null}
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="mb-8">
           <VirtualWorkspace

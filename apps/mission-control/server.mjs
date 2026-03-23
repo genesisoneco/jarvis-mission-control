@@ -26,10 +26,42 @@ const routingPolicy = await fs
   .then((raw) => JSON.parse(raw))
   .catch(() => null)
 
+const statusDir = path.join(workspaceRoot, 'status')
+
+async function readAgentStatusFiles() {
+  try {
+    const entries = await fs.readdir(statusDir, { withFileTypes: true })
+    const files = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
+
+    const agents = []
+    for (const file of files) {
+      const fullPath = path.join(statusDir, file.name)
+      try {
+        const raw = await fs.readFile(fullPath, 'utf8')
+        const parsed = JSON.parse(raw)
+        if (parsed && typeof parsed.agent === 'string') {
+          agents.push(parsed)
+        }
+      } catch {
+        // ignore malformed status files
+      }
+    }
+
+    return agents
+  } catch {
+    return []
+  }
+}
+
 app.disable('x-powered-by')
 app.set('trust proxy', true)
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+
+app.get('/api/agent-status', ensureAuthenticated, async (req, res) => {
+  const agents = await readAgentStatusFiles()
+  res.json({ agents })
+})
 
 function escapeHtml(value) {
   return String(value)
