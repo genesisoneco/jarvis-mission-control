@@ -12,7 +12,10 @@ Mission Control is a focused operator dashboard for monitoring Jarvis/OpenClaw h
 - The simulation layer lives in `src/components/VirtualWorkspace.tsx`.
 - Jarvis, Elon, Jensen, and Trinity now move from a more explicit truth layer exposed by `server.mjs`: session-derived `explicitActivityState`, `explicitActivityLabel`, `explicitActivitySource`, `explicitActivityConfidence`, task-summary provenance, and spawned-session collaboration context.
 - Clicking an agent focuses its current office position, state, nearby signals, runtime/task readout, and the truth/source note that drove the current embodiment.
-- The office also reacts lightly to runtime state now: collaboration brightens the shared room, blocked work warms the alert wall, and engaged props (screens, boards, coffee, servers) animate subtly without turning the dashboard into noise.
+- The room now has a stronger ambient-state layer: calm, busy, collaboration, incident, and watch/focus modes change how the office breathes without inventing fake work.
+- Props now carry more of the storytelling load. Screens, boards, coffee, lamps, windows, plants, and servers react through light ambient/support/alert/engaged states instead of a single generic glow.
+- Agent motion now includes small settle phases after movement plus role-weighted pacing/personality differences so Jarvis feels steadier, Elon brisker, Jensen more measured, and Trinity smoother.
+- Focus/fullscreen mode now leans into a watchable scene with stronger room framing instead of just making the same view bigger.
 - The rest of Mission Control remains the same operational dashboard around the sim.
 
 ## Modes

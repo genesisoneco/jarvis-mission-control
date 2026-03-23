@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { Activity, AlertTriangle, Coffee, Cpu, Maximize2, Minimize2, Radio, Sparkles } from 'lucide-react'
+import { Activity, AlertTriangle, Coffee, Cpu, Maximize2, Minimize2, Radio } from 'lucide-react'
 import { buildWaypointPath, homeZoneByAgent, intentZone, nearestWaypoint, pointDistance, prioritizedPropsForAgent, waypointPositions, zoneById, zoneDefinitions, type Point, type ZoneId } from './workspace/scene'
 import type { EventItem, Health, Presence, WorkspaceAgent, WorkspaceHandoff } from './workspace/types'
 
@@ -26,10 +26,21 @@ type AgentMotionState = {
   finalAction: string
   seatIndex: number
   holdUntilBeat: number
+  settleUntilBeat: number
   isMoving: boolean
 }
 
-type CreaturePose = 'desk' | 'monitor' | 'meeting' | 'alert' | 'break' | 'wander' | 'waiting' | 'presenting'
+type CreaturePose = 'desk' | 'monitor' | 'meeting' | 'alert' | 'break' | 'wander' | 'waiting' | 'presenting' | 'settling'
+type RoomMode = 'calm' | 'busy' | 'collab' | 'incident' | 'watch'
+type PropActivity = 'idle' | 'ambient' | 'support' | 'alert' | 'engaged'
+
+type RoomModeProfile = {
+  mode: RoomMode
+  label: string
+  note: string
+  className: string
+  chips: string[]
+}
 
 type FullscreenDocument = Document & {
   webkitFullscreenElement?: Element | null
@@ -52,6 +63,13 @@ const spreadOffsets: Point[] = [
   { x: -8, y: 0.8 },
   { x: 8, y: 0.8 },
 ]
+
+const personalitySpeed: Record<string, number> = {
+  jarvis: 0.98,
+  elon: 1.16,
+  jensen: 0.9,
+  trinity: 1.03,
+}
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
@@ -179,8 +197,9 @@ function actionForZone(zoneId: ZoneId, agent: WorkspaceAgent, propType?: string)
   }[agent.id] ?? agent.interactionLabel
 }
 
-function poseForMotion(zoneId: ZoneId, action: string, isMoving = false, activityState?: WorkspaceAgent['activityState']): CreaturePose {
+function poseForMotion(zoneId: ZoneId, action: string, isMoving = false, activityState?: WorkspaceAgent['activityState'], isSettling = false): CreaturePose {
   if (isMoving) return 'wander'
+  if (isSettling) return 'settling'
   if (activityState === 'waiting_input') return 'waiting'
   if (activityState === 'collaborating') return 'presenting'
   if (zoneId === 'meeting-area') return 'meeting'
@@ -332,15 +351,118 @@ function roleAccessory(agentId: string) {
   }[agentId] ?? '•'
 }
 
+function personalityClass(agentId: string) {
+  return `persona-${agentId}`
+}
+
+function roomModeProfile(agents: WorkspaceAgent[], handoffs: WorkspaceHandoff[], events: EventItem[], isFocused: boolean): RoomModeProfile {
+  const criticalEvent = events.some((event) => event.severity === 'critical')
+  const blockedAgents = agents.filter((agent) => agent.sceneState === 'blocked' || agent.activityState === 'blocked').length
+  const collaboratingAgents = agents.filter((agent) => agent.sceneState === 'handoff' || agent.activityState === 'collaborating').length
+  const activeAgents = agents.filter((agent) => agent.sceneState === 'active' || agent.activityState === 'executing').length
+  const warmAgents = agents.filter((agent) => agent.sceneState === 'waiting').length
+
+  if (criticalEvent || blockedAgents > 0) {
+    return {
+      mode: 'incident',
+      label: 'Incident response mode',
+      note: 'The room tightens around the alert wall, servers breathe louder, and screens cool-shift toward intervention.',
+      className: 'room-alert',
+      chips: [blockedAgents > 0 ? `${blockedAgents} blocked` : 'Critical event', activeAgents > 0 ? `${activeAgents} active` : 'Watch standing'],
+    }
+  }
+
+  if (handoffs.some((handoff) => handoff.explicit) || collaboratingAgents >= 2) {
+    return {
+      mode: 'collab',
+      label: 'Collaboration mode',
+      note: 'The center table wakes up, shared surfaces glow a touch brighter, and the room feels gathered instead of busy-for-busy’s-sake.',
+      className: 'room-collab',
+      chips: [handoffs.length > 0 ? `${handoffs.length} links` : 'Shared work', `${Math.max(1, collaboratingAgents)} in sync`],
+    }
+  }
+
+  if (isFocused && activeAgents > 0) {
+    return {
+      mode: 'watch',
+      label: 'Watch mode',
+      note: 'Focus view softens the outer room and lets the active work surfaces carry the scene.',
+      className: 'room-watch',
+      chips: [`${activeAgents} active`, warmAgents > 0 ? `${warmAgents} queued` : 'Focused view'],
+    }
+  }
+
+  if (activeAgents >= 2 || warmAgents >= 3) {
+    return {
+      mode: 'busy',
+      label: 'Busy runtime mode',
+      note: 'Monitors, board edges, and support props stay lightly alive while the room keeps its footing.',
+      className: 'room-busy',
+      chips: [`${activeAgents} active`, `${warmAgents} waiting`],
+    }
+  }
+
+  return {
+    mode: 'calm',
+    label: 'Calm ambient mode',
+    note: 'The office settles into low, believable motion: window shimmer, lamp hum, coffee steam, and small idle tells.',
+    className: 'room-calm',
+    chips: [agents.length > 0 ? `${agents.length} stations visible` : 'Preview', 'Low-noise room'],
+  }
+}
+
+function buildPropActivityMap(room: RoomModeProfile, selected: WorkspaceAgent | undefined, selectedMotion: AgentMotionState | null, activePropIds: Set<string>) {
+  const activity = new Map<string, PropActivity>()
+  const apply = (propIds: string[], value: PropActivity) => {
+    propIds.forEach((propId) => {
+      const current = activity.get(propId)
+      const currentRank = ['idle', 'ambient', 'support', 'alert', 'engaged'].indexOf(current ?? 'idle')
+      const nextRank = ['idle', 'ambient', 'support', 'alert', 'engaged'].indexOf(value)
+      if (nextRank >= currentRank) activity.set(propId, value)
+    })
+  }
+
+  zoneDefinitions.forEach((zone) => {
+    apply(zone.props.filter((prop) => ['window', 'lamp', 'plant'].includes(prop.type)).map((prop) => prop.id), 'ambient')
+  })
+
+  if (room.mode === 'busy') {
+    apply(['cmd-monitor', 'eng-monitor', 'eng-display', 'res-monitor', 'comms-monitor', 'cmd-whiteboard', 'eng-server-main'], 'support')
+  }
+
+  if (room.mode === 'collab') {
+    apply(['meeting-display', 'meeting-whiteboard', 'meeting-coffee', 'meeting-lamp', 'meeting-table'], 'support')
+  }
+
+  if (room.mode === 'incident') {
+    apply(['alert-display', 'alert-console', 'alert-server-left', 'alert-server-right', 'eng-server-main', 'eng-display', 'alert-lamp'], 'alert')
+  }
+
+  if (room.mode === 'calm') {
+    apply(['break-coffee', 'break-coffee-dark', 'break-lamp', 'break-window', 'break-sofa'], 'ambient')
+  }
+
+  if (room.mode === 'watch') {
+    apply(['cmd-monitor', 'eng-monitor', 'res-monitor', 'comms-monitor', 'meeting-display'], 'support')
+  }
+
+  if (selected && selectedMotion) {
+    const zone = zoneById(selectedMotion.targetZone)
+    apply(zone.props.map((prop) => prop.id), 'support')
+  }
+
+  apply([...activePropIds], 'engaged')
+  return activity
+}
+
 function renderCreature(agent: WorkspaceAgent, pose: CreaturePose, directionClass = 'sim-agent-facing-right', panel = false) {
   return (
     <div
-      className={`sim-creature ${panel ? 'sim-creature-panel' : ''} ${directionClass} ${characterMoodClass(agent.mood)} pose-${pose}`}
+      className={`sim-creature ${personalityClass(agent.id)} ${panel ? 'sim-creature-panel' : ''} ${directionClass} ${characterMoodClass(agent.mood)} pose-${pose}`}
       style={creaturePalette(agent.id) as CSSProperties}
     >
       <div className="sim-creature-floor-shadow" />
       <div className="sim-creature-shadow" />
-      <div className="sim-creature-tail" />
       <div className="sim-creature-body-shell">
         <div className="sim-creature-ear sim-creature-ear-left" />
         <div className="sim-creature-ear sim-creature-ear-right" />
@@ -469,14 +591,6 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
   const isWorkspaceFocused = isBrowserFullscreen || isFallbackFocused
   const visibleHandoffs = useMemo(() => handoffs.filter((handoff) => handoff.explicit).slice(0, 4), [handoffs])
   const handoffSet = useMemo(() => new Set(handoffs.flatMap((handoff) => [handoff.from.toLowerCase(), handoff.to.toLowerCase()])), [handoffs])
-  const roomStateClass = useMemo(() => {
-    if (agents.some((agent) => agent.activityState === 'blocked')) return 'room-alert'
-    if (agents.some((agent) => agent.activityState === 'collaborating')) return 'room-collab'
-    if (agents.some((agent) => agent.activityState === 'executing')) return 'room-busy'
-    if (agents.every((agent) => agent.activityState === 'cooldown' || agent.activityState === 'idle')) return 'room-calm'
-    return 'room-neutral'
-  }, [agents])
-  const activePropIds = useMemo(() => new Set(Object.values(motion).map((state) => state?.targetPropId).filter(Boolean)), [motion])
 
   useEffect(() => {
     if (agents.length === 0) return
@@ -496,6 +610,7 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
           targetPropType: undefined,
           seatIndex: index,
           holdUntilBeat: beat + 1,
+          settleUntilBeat: beat + 1,
           isMoving: true,
         }
       }
@@ -522,6 +637,7 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
       current.finalAction = planned.action
       current.seatIndex = Math.max(0, seatIndex)
       current.holdUntilBeat = beat + nextStop.dwellBeats
+      current.settleUntilBeat = beat + 1
       current.isMoving = planned.route.length > 0
     })
 
@@ -542,7 +658,8 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
         }
 
         const [target, ...rest] = current.route
-        const speed = agent.sceneState === 'blocked' ? 0.42 : agent.sceneState === 'active' ? 0.34 : agent.sceneState === 'handoff' ? 0.3 : agent.sceneState === 'waiting' ? 0.24 : 0.18
+        const baseSpeed = agent.sceneState === 'blocked' ? 0.42 : agent.sceneState === 'active' ? 0.34 : agent.sceneState === 'handoff' ? 0.3 : agent.sceneState === 'waiting' ? 0.24 : 0.18
+        const speed = baseSpeed * (personalitySpeed[agent.id] ?? 1)
         const stepped = stepToward(current.position, target, speed)
         current.isMoving = pointDistance(stepped, current.position) >= 0.01
         if (current.isMoving) current.action = `walking to ${zoneById(current.targetZone).label.toLowerCase()}`
@@ -554,6 +671,7 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
             current.isMoving = false
             current.action = current.finalAction
             current.facing = facingForZone(current.targetZone, stepped)
+            current.settleUntilBeat = beat + 1
           }
         }
       })
@@ -569,38 +687,19 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
 
   const selected = agents.find((agent) => agent.id === selectedAgentId) ?? agents[0]
   const selectedMotion = selected ? motion[selected.id] : null
+  const roomProfile = useMemo(() => roomModeProfile(agents, handoffs, events, isWorkspaceFocused), [agents, handoffs, events, isWorkspaceFocused])
+  const activePropIds = useMemo(() => new Set(Object.values(motion).map((state) => state?.targetPropId).filter((value): value is string => Boolean(value))), [motion])
+  const propActivityMap = useMemo(() => buildPropActivityMap(roomProfile, selected, selectedMotion, activePropIds), [roomProfile, selected, selectedMotion, activePropIds])
   const activeCount = agents.filter((agent) => (['active', 'warm', 'blocked'] as Presence[]).includes(agent.presence)).length
 
   return (
     <div className="space-y-6">
       <div className="rounded-[2rem] border border-slate-800/90 bg-slate-950/70 p-3 shadow-[0_30px_120px_rgba(2,6,23,0.55)] lg:p-5">
-        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.24em] text-cyan-300">
-              <Sparkles className="h-3.5 w-3.5" /> Hero workspace
-            </div>
-            <div className="text-xl font-semibold text-white lg:text-2xl">Front-of-screen virtual office</div>
-            <div className="mt-2 max-w-3xl text-sm text-slate-400">The room leads now: a wide office scene sits directly under the header, with live agent behavior and support panels flowing underneath instead of competing above the fold.</div>
-          </div>
-          <div className="grid gap-2 text-xs text-slate-400 sm:grid-cols-3 lg:min-w-[360px]">
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Live signals</div>
-              <div className="mt-1 text-lg font-semibold text-white">{activeCount}</div>
-            </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Handoff windows</div>
-              <div className="mt-1 text-lg font-semibold text-white">{handoffs.length}</div>
-            </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Truth mode</div>
-              <div className="mt-1 text-sm font-medium text-cyan-300">{isLive ? 'Runtime-derived' : 'Preview snapshot'}</div>
-            </div>
-          </div>
-        </div>
-
         <div ref={workspaceShellRef} className={`office-sim-shell ${isWorkspaceFocused ? 'is-focused' : ''} ${isBrowserFullscreen ? 'is-native-fullscreen' : ''}`}>
-          <div className={`office-sim relative overflow-hidden rounded-[2rem] border border-slate-700/70 bg-slate-900/60 ${roomStateClass}`}>
+          <div className={`office-sim relative overflow-hidden rounded-[2rem] border border-slate-700/70 bg-slate-900/60 ${roomProfile.className}`}>
             <div className="office-sim-stars" />
+            <div className="office-sim-atmosphere" />
+            <div className="office-sim-haze" />
             <div className="office-sim-lights" />
             <div className="office-sim-wall office-sim-wall-top" />
             <div className="office-sim-wall office-sim-wall-left" />
@@ -620,20 +719,14 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
             <div className="office-sim-ceiling-lamp office-sim-ceiling-lamp-left" />
             <div className="office-sim-ceiling-lamp office-sim-ceiling-lamp-center" />
             <div className="office-sim-ceiling-lamp office-sim-ceiling-lamp-right" />
+            <div className="office-sim-vignette" />
 
             <div className="office-sim-headerbar">
-              <div className="space-y-2">
-                <div className="office-sim-headerchip">Mission office live scene</div>
-                <div className="office-sim-linknote">
-                  {visibleHandoffs.length > 0
-                    ? 'Dotted blue links only appear for explicit collaboration or handoff relationships.'
-                    : 'No explicit collaboration link is active right now, so the scene stays clean.'}
-                </div>
-              </div>
-              <div className="inline-flex flex-wrap items-center justify-end gap-2 text-[11px] text-slate-500">
+              <div className="office-sim-headerdock">
+                <span className="office-sim-headerchip">{roomProfile.label}</span>
                 <span className="office-sim-statpill">{isLive ? 'Live feed' : 'Preview feed'}</span>
                 <span className="office-sim-statpill">{agents.reduce((sum, agent) => sum + agent.signalCount, 0)} markers</span>
-                <span className="office-sim-statpill">{visibleHandoffs.length > 0 ? `${visibleHandoffs.length} linked` : 'No live links'}</span>
+                {visibleHandoffs.length > 0 ? <span className="office-sim-statpill">{visibleHandoffs.length} linked</span> : null}
                 {isWorkspaceFocused ? <span className="office-sim-statpill">Esc to exit focus</span> : null}
               </div>
             </div>
@@ -645,6 +738,7 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
                   <div
                     key={zone.id}
                     className={`office-zone bg-gradient-to-br ${zone.accentClass}`}
+                    data-zone={zone.id}
                     style={{ left: `${zone.position.x}%`, top: `${zone.position.y}%`, width: `${zone.position.w}%`, height: `${zone.position.h}%` }}
                   >
                     <div className="office-zone-label">
@@ -652,15 +746,20 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
                         <Icon className="h-3 w-3" /> {zone.label}
                       </div>
                     </div>
-                    {zone.props.map((prop) => (
-                      <div
-                        key={prop.id}
-                        className={`office-prop office-prop-${prop.type} ${activePropIds.has(prop.id) ? 'is-engaged' : ''}`}
-                        data-zone={zone.id}
-                        data-prop-id={prop.id}
-                        style={{ left: `${prop.x}%`, top: `${prop.y}%`, width: `${prop.w ?? 4}%`, height: `${prop.h ?? 4}%` }}
-                      />
-                    ))}
+                    {zone.props.map((prop) => {
+                      const propActivity = propActivityMap.get(prop.id) ?? 'idle'
+                      return (
+                        <div
+                          key={prop.id}
+                          className={`office-prop office-prop-${prop.type} ${activePropIds.has(prop.id) ? 'is-engaged' : ''} is-${propActivity}`}
+                          data-zone={zone.id}
+                          data-prop-id={prop.id}
+                          data-activity={propActivity}
+                          data-room-mode={roomProfile.mode}
+                          style={{ left: `${prop.x}%`, top: `${prop.y}%`, width: `${prop.w ?? 4}%`, height: `${prop.h ?? 4}%` }}
+                        />
+                      )
+                    })}
                   </div>
                 )
               })}
@@ -688,42 +787,45 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
               })}
             </svg>
 
-            {agents.map((agent, index) => {
+            {agents.map((agent) => {
               const state = motion[agent.id]
               const targetZone = state?.targetZone ?? intentZone(agent.intent, agent.id)
               const position = state?.position ?? zoneById(homeZoneByAgent[agent.id] ?? 'meeting-area').anchor
               const selectedAgent = selectedAgentId === agent.id
               const directionClass = state?.facing === 'left' ? 'sim-agent-facing-left' : 'sim-agent-facing-right'
               const isMoving = Boolean(state?.isMoving)
-              const pose = poseForMotion(targetZone, state?.action ?? agent.interactionLabel, isMoving, agent.activityState)
+              const isSettling = Boolean(state && !state.isMoving && beat <= state.settleUntilBeat)
+              const pose = poseForMotion(targetZone, state?.action ?? agent.interactionLabel, isMoving, agent.activityState, isSettling)
               const placement = placementForZone(targetZone)
               const motionClass = agent.sceneState === 'blocked'
                 ? 'sim-agent-shake'
                 : isMoving
                   ? 'sim-agent-walk'
-                  : agent.activityState === 'waiting_input'
-                    ? 'sim-agent-wait'
-                    : agent.activityState === 'collaborating'
-                      ? 'sim-agent-present'
-                      : agent.activityState === 'cooldown'
-                        ? 'sim-agent-rest'
-                        : 'sim-agent-float'
+                  : isSettling
+                    ? 'sim-agent-settle'
+                    : agent.activityState === 'waiting_input'
+                      ? 'sim-agent-wait'
+                      : agent.activityState === 'collaborating'
+                        ? 'sim-agent-present'
+                        : agent.activityState === 'cooldown'
+                          ? 'sim-agent-rest'
+                          : 'sim-agent-float'
 
               return (
                 <button
                   key={agent.id}
                   type="button"
                   onClick={() => onSelectAgent(agent.id)}
-                  className={`sim-agent ${selectedAgent ? 'is-selected' : ''}`}
+                  className={`sim-agent ${personalityClass(agent.id)} ${selectedAgent ? 'is-selected' : ''}`}
                   style={{ left: `${position.x}%`, top: `${position.y + placement.lift}%`, ['--agent-scale' as string]: `${placement.scale}`, ['--label-opacity' as string]: selectedAgent ? '1' : '0.66' } as CSSProperties}
                   aria-label={`Focus ${agent.name}`}
                 >
                   <div className={`sim-agent-glow workspace-${agent.presence}`} />
-                  <div className={`sim-agent-body ${directionClass} ${motionClass}`}>
+                  <div className={`sim-agent-body ${personalityClass(agent.id)} ${directionClass} ${motionClass}`}>
                     <div className="sim-agent-stage">
                       {renderCreature(agent, pose, directionClass)}
                       <div className="sim-agent-status-stack">
-                        <span className={`sim-agent-status is-always-visible ${sceneStatusTone(agent.sceneState)}`}>
+                        <span className={`sim-agent-status ${sceneStatusTone(agent.sceneState)}`}>
                           <span className="sim-agent-status-dot" />
                           {agent.sceneLabel}
                         </span>
@@ -753,6 +855,47 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
             </button>
           </div>
         </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2.5">
+          <span className="workspace-meta-pill">
+            <span className="workspace-meta-label">Live signals</span>
+            <span className="workspace-meta-value">{activeCount}</span>
+          </span>
+          <span className="workspace-meta-pill">
+            <span className="workspace-meta-label">Room mode</span>
+            <span className="workspace-meta-text">{roomProfile.label}</span>
+          </span>
+          {visibleHandoffs.length > 0 ? (
+            <span className="workspace-meta-pill">
+              <span className="workspace-meta-label">Linked work</span>
+              <span className="workspace-meta-value">{visibleHandoffs.length}</span>
+            </span>
+          ) : null}
+          <span className="workspace-meta-pill is-muted">
+            <span className="workspace-meta-label">Mode</span>
+            <span className="workspace-meta-text">{isLive ? 'Live runtime' : 'Preview snapshot'}</span>
+          </span>
+          {roomProfile.chips.map((chip) => (
+            <span key={chip} className="workspace-meta-pill is-muted">
+              <span className="workspace-meta-text">{chip}</span>
+            </span>
+          ))}
+        </div>
+
+        <div className="workspace-scene-notes">
+          <div className="workspace-scene-note-card">
+            <div className="workspace-scene-note-label">Scene read</div>
+            <div className="workspace-scene-note-text">{roomProfile.note}</div>
+          </div>
+          <div className="workspace-scene-note-card is-muted">
+            <div className="workspace-scene-note-label">Link policy</div>
+            <div className="workspace-scene-note-text">
+              {visibleHandoffs.length > 0
+                ? 'Dotted blue links only appear for explicit collaboration or handoff relationships.'
+                : 'No explicit collaboration link is active right now, so the scene stays visually clean.'}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr_0.85fr]">
@@ -773,7 +916,7 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
                   <div className={`rounded-[28px] border border-white/10 bg-gradient-to-br ${selected.avatarClass} p-[1px]`}>
                     <div className="grid gap-4 rounded-[27px] bg-slate-950/88 p-4 sm:grid-cols-[auto_1fr]">
                       <div className="flex items-center justify-center">
-                        {renderCreature(selected, poseForMotion(selectedMotion?.targetZone ?? intentZone(selected.intent, selected.id), selectedMotion?.action ?? selected.interactionLabel, Boolean(selectedMotion?.isMoving), selected.activityState), 'sim-agent-facing-right', true)}
+                        {renderCreature(selected, poseForMotion(selectedMotion?.targetZone ?? intentZone(selected.intent, selected.id), selectedMotion?.action ?? selected.interactionLabel, Boolean(selectedMotion?.isMoving), selected.activityState, Boolean(selectedMotion && !selectedMotion.isMoving && beat <= selectedMotion.settleUntilBeat)), 'sim-agent-facing-right', true)}
                       </div>
                       <div>
                         <div className="flex flex-wrap gap-2">
@@ -956,6 +1099,10 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
               <Coffee className="h-4 w-4 text-cyan-300" /> Behavior cues
             </div>
             <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+              <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-3 py-2 text-xs text-slate-200">
+                <div className="text-[10px] uppercase tracking-[0.18em] text-cyan-300">Room pulse</div>
+                <div className="mt-1">{roomProfile.note}</div>
+              </div>
               {selected?.observations.map((item) => (
                 <div key={item} className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-300">{item}</div>
               ))}

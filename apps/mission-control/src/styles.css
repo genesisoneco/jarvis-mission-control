@@ -120,9 +120,12 @@ body {
 }
 
 .office-sim-stars,
+.office-sim-atmosphere,
+.office-sim-haze,
 .office-sim-lights,
 .office-sim-floor,
 .office-sim-floor-glow,
+.office-sim-vignette,
 .office-handoffs,
 .office-zones {
   pointer-events: none;
@@ -134,14 +137,19 @@ body {
   position: absolute;
   left: 3%;
   right: 3%;
-  top: 3.25%;
+  top: 2.75%;
   z-index: 3;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: flex-end;
   pointer-events: none;
+}
+
+.office-sim-headerdock {
+  display: inline-flex;
+  max-width: min(68%, 560px);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .office-sim-headerchip,
@@ -217,7 +225,9 @@ body {
 .office-sim-wall {
   z-index: 0;
   border: 1px solid rgba(226, 232, 240, 0.08);
-  background: linear-gradient(180deg, rgba(100, 116, 139, 0.22), rgba(30, 41, 59, 0.08));
+  background:
+    linear-gradient(180deg, rgba(148, 163, 184, 0.18), rgba(51, 65, 85, 0.1)),
+    linear-gradient(90deg, rgba(250, 204, 21, 0.08), rgba(34, 211, 238, 0.05) 46%, rgba(244, 114, 182, 0.06));
 }
 
 .office-sim-wall-top {
@@ -249,7 +259,7 @@ body {
   border-radius: 18px;
   border: 1px solid rgba(186, 230, 253, 0.22);
   background:
-    linear-gradient(180deg, rgba(186, 230, 253, 0.26), rgba(56, 189, 248, 0.08)),
+    linear-gradient(180deg, rgba(254, 240, 138, 0.14), rgba(186, 230, 253, 0.24) 34%, rgba(56, 189, 248, 0.08)),
     linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
     linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
   background-size: auto, 28px 100%, 100% 28px;
@@ -274,7 +284,7 @@ body {
   z-index: 1;
   border-radius: 9999px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), rgba(125, 211, 252, 0.08) 54%, transparent 100%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), rgba(125, 211, 252, 0.08) 46%, rgba(251, 191, 36, 0.07) 72%, transparent 100%);
   filter: blur(0.4px);
 }
 
@@ -323,21 +333,54 @@ body {
   opacity: 0.7;
 }
 
+.office-sim-atmosphere {
+  background:
+    radial-gradient(circle at 22% 28%, rgba(255, 255, 255, 0.06) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 58% 18%, rgba(255, 255, 255, 0.05) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 76% 64%, rgba(255, 255, 255, 0.04) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 34% 74%, rgba(255, 255, 255, 0.05) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 16% 18%, rgba(250, 204, 21, 0.08), transparent 15%),
+    radial-gradient(circle at 84% 22%, rgba(244, 114, 182, 0.06), transparent 14%);
+  opacity: 0.46;
+  animation: officeDustDrift 18s linear infinite;
+}
+
+.office-sim-haze {
+  background:
+    radial-gradient(circle at 18% 26%, rgba(125, 211, 252, 0.1), transparent 18%),
+    radial-gradient(circle at 82% 22%, rgba(244, 114, 182, 0.08), transparent 16%),
+    radial-gradient(circle at 50% 52%, rgba(255, 255, 255, 0.04), transparent 28%);
+  opacity: 0.65;
+  filter: blur(12px);
+  animation: officeHazeBreath 10s ease-in-out infinite;
+}
+
 .office-sim-lights {
   background:
     radial-gradient(circle at 12% 12%, rgba(125, 211, 252, 0.18), transparent 16%),
     radial-gradient(circle at 88% 14%, rgba(244, 114, 182, 0.12), transparent 16%),
-    radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.12), transparent 22%);
+    radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.12), transparent 22%),
+    radial-gradient(circle at 32% 18%, rgba(250, 204, 21, 0.12), transparent 18%),
+    radial-gradient(circle at 68% 18%, rgba(251, 191, 36, 0.08), transparent 16%);
+}
+
+.office-sim-vignette {
+  background:
+    radial-gradient(circle at 50% 46%, transparent 0 48%, rgba(2, 6, 23, 0.14) 76%, rgba(2, 6, 23, 0.34) 100%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.22), transparent 18%, transparent 82%, rgba(2, 6, 23, 0.28));
 }
 
 .office-sim-floor {
   inset: 8% 5% 6% 5%;
   border-radius: 40px;
   background:
-    linear-gradient(180deg, rgba(71, 85, 105, 0.9), rgba(30, 41, 59, 0.94) 40%, rgba(15, 23, 42, 0.98)),
+    linear-gradient(180deg, rgba(120, 113, 108, 0.42), rgba(71, 85, 105, 0.88) 18%, rgba(30, 41, 59, 0.94) 44%, rgba(15, 23, 42, 0.98)),
     linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: auto, 38px 100%, 100% 38px;
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 22% 24%, rgba(16, 185, 129, 0.06), transparent 18%),
+    radial-gradient(circle at 80% 24%, rgba(249, 115, 22, 0.06), transparent 18%),
+    radial-gradient(circle at 50% 74%, rgba(168, 85, 247, 0.05), transparent 22%);
+  background-size: auto, 38px 100%, 100% 38px, auto, auto, auto;
   border: 1px solid rgba(148, 163, 184, 0.22);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 36px 100px rgba(15, 23, 42, 0.32);
 }
@@ -347,7 +390,9 @@ body {
   background:
     radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.1), transparent 24%),
     radial-gradient(circle at 20% 25%, rgba(16, 185, 129, 0.08), transparent 18%),
-    radial-gradient(circle at 80% 72%, rgba(244, 114, 182, 0.08), transparent 20%);
+    radial-gradient(circle at 80% 72%, rgba(244, 114, 182, 0.08), transparent 20%),
+    radial-gradient(circle at 78% 24%, rgba(251, 146, 60, 0.08), transparent 18%),
+    radial-gradient(circle at 26% 72%, rgba(59, 130, 246, 0.06), transparent 20%);
 }
 
 .office-sim-walkway {
@@ -429,6 +474,34 @@ body {
   padding: 5px 8px;
   opacity: 0.78;
   backdrop-filter: blur(8px);
+}
+
+.office-zone[data-zone='command-desk'] {
+  background-color: rgba(8, 47, 73, 0.08);
+}
+
+.office-zone[data-zone='engineering-bay'] {
+  background-color: rgba(120, 53, 15, 0.08);
+}
+
+.office-zone[data-zone='research-corner'] {
+  background-color: rgba(6, 78, 59, 0.08);
+}
+
+.office-zone[data-zone='comms-desk'] {
+  background-color: rgba(131, 24, 67, 0.08);
+}
+
+.office-zone[data-zone='meeting-area'] {
+  background-color: rgba(71, 85, 105, 0.08);
+}
+
+.office-zone[data-zone='alert-wall'] {
+  background-color: rgba(127, 29, 29, 0.08);
+}
+
+.office-zone[data-zone='break-area'] {
+  background-color: rgba(76, 29, 149, 0.07);
 }
 
 .office-prop {
@@ -778,6 +851,81 @@ body {
   box-shadow: 0 10px 16px rgba(15, 23, 42, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
+.office-prop[data-zone='command-desk'][data-prop-id='cmd-desk'],
+.office-prop[data-zone='meeting-area'][data-prop-id='meeting-table'] {
+  background:
+    linear-gradient(180deg, rgba(254, 243, 199, 0.88) 0%, rgba(217, 119, 6, 0.28) 30%, rgba(120, 53, 15, 0.86) 100%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0 10%, transparent 10% 90%, rgba(17, 24, 39, 0.16) 90% 100%);
+}
+
+.office-prop[data-zone='engineering-bay'][data-prop-id='eng-desk'],
+.office-prop[data-zone='alert-wall'][data-prop-id='alert-console'] {
+  background:
+    linear-gradient(180deg, rgba(226, 232, 240, 0.72) 0%, rgba(148, 163, 184, 0.48) 36%, rgba(51, 65, 85, 0.94) 100%),
+    linear-gradient(90deg, rgba(251, 191, 36, 0.16), transparent 30%, rgba(59, 130, 246, 0.08));
+}
+
+.office-prop[data-zone='research-corner'][data-prop-id='res-desk'] {
+  background:
+    linear-gradient(180deg, rgba(220, 252, 231, 0.9) 0%, rgba(52, 211, 153, 0.26) 32%, rgba(20, 83, 45, 0.86) 100%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 12%, transparent 12% 88%, rgba(15, 23, 42, 0.08) 88% 100%);
+}
+
+.office-prop[data-zone='comms-desk'][data-prop-id='comms-desk'] {
+  background:
+    linear-gradient(180deg, rgba(252, 231, 243, 0.92) 0%, rgba(244, 114, 182, 0.24) 34%, rgba(131, 24, 67, 0.86) 100%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 12%, transparent 12% 88%, rgba(15, 23, 42, 0.08) 88% 100%);
+}
+
+.office-prop[data-zone='command-desk'][data-prop-id='cmd-chair'] {
+  background:
+    linear-gradient(180deg, rgba(147, 197, 253, 0.82), rgba(14, 116, 144, 0.42) 42%, rgba(15, 23, 42, 0.96) 100%),
+    linear-gradient(90deg, transparent 0 18%, rgba(255, 255, 255, 0.12) 18% 82%, transparent 82% 100%);
+}
+
+.office-prop[data-zone='engineering-bay'][data-prop-id='eng-chair'] {
+  background:
+    linear-gradient(180deg, rgba(253, 186, 116, 0.84), rgba(234, 88, 12, 0.42) 42%, rgba(67, 20, 7, 0.94) 100%),
+    linear-gradient(90deg, transparent 0 18%, rgba(255, 255, 255, 0.12) 18% 82%, transparent 82% 100%);
+}
+
+.office-prop[data-zone='research-corner'][data-prop-id='res-chair'] {
+  background:
+    linear-gradient(180deg, rgba(110, 231, 183, 0.84), rgba(13, 148, 136, 0.42) 42%, rgba(17, 24, 39, 0.94) 100%),
+    linear-gradient(90deg, transparent 0 18%, rgba(255, 255, 255, 0.12) 18% 82%, transparent 82% 100%);
+}
+
+.office-prop[data-zone='comms-desk'][data-prop-id='comms-chair'],
+.office-prop[data-zone='break-area'][data-prop-id='break-chair'] {
+  background:
+    linear-gradient(180deg, rgba(244, 171, 248, 0.84), rgba(192, 38, 211, 0.34) 42%, rgba(76, 29, 149, 0.92) 100%),
+    linear-gradient(90deg, transparent 0 18%, rgba(255, 255, 255, 0.12) 18% 82%, transparent 82% 100%);
+}
+
+.office-prop[data-zone='command-desk'][data-prop-id='cmd-rug'] {
+  background: radial-gradient(circle, rgba(224, 242, 254, 0.18), rgba(34, 211, 238, 0.14) 52%, rgba(14, 116, 144, 0.1) 74%, transparent 100%);
+}
+
+.office-prop[data-zone='engineering-bay'][data-prop-id='eng-rug'] {
+  background: radial-gradient(circle, rgba(255, 237, 213, 0.18), rgba(251, 146, 60, 0.14) 52%, rgba(154, 52, 18, 0.1) 74%, transparent 100%);
+}
+
+.office-prop[data-zone='research-corner'][data-prop-id='res-rug'] {
+  background: radial-gradient(circle, rgba(220, 252, 231, 0.18), rgba(16, 185, 129, 0.14) 52%, rgba(6, 95, 70, 0.1) 74%, transparent 100%);
+}
+
+.office-prop[data-zone='comms-desk'][data-prop-id='comms-rug'] {
+  background: radial-gradient(circle, rgba(252, 231, 243, 0.18), rgba(244, 114, 182, 0.14) 52%, rgba(157, 23, 77, 0.1) 74%, transparent 100%);
+}
+
+.office-prop[data-zone='meeting-area'][data-prop-id='meeting-rug'] {
+  background: radial-gradient(circle, rgba(254, 249, 195, 0.16), rgba(125, 211, 252, 0.1) 54%, rgba(59, 130, 246, 0.08) 76%, transparent 100%);
+}
+
+.office-prop[data-zone='break-area'][data-prop-id='break-rug'] {
+  background: radial-gradient(circle, rgba(237, 233, 254, 0.18), rgba(168, 85, 247, 0.12) 54%, rgba(79, 70, 229, 0.08) 76%, transparent 100%);
+}
+
 .office-prop[data-zone='command-desk'][data-prop-id='cmd-cabinet'],
 .office-prop[data-zone='research-corner'][data-prop-id='res-cabinet'],
 .office-prop[data-zone='comms-desk'][data-prop-id='comms-cabinet'],
@@ -942,32 +1090,32 @@ body {
 .sim-agent-status-stack {
   position: absolute;
   left: 50%;
-  top: -12px;
+  top: -6px;
   z-index: 4;
   display: flex;
-  max-width: 110px;
+  max-width: 104px;
   flex-direction: column;
   align-items: center;
   gap: 4px;
   transform: translate(-50%, -100%);
-  opacity: var(--label-opacity, 0.8);
+  opacity: var(--label-opacity, 0.72);
   pointer-events: none;
 }
 
 .sim-agent-status {
   position: relative;
   display: inline-flex;
-  min-width: 54px;
-  max-width: 110px;
+  min-width: 52px;
+  max-width: 104px;
   align-items: center;
   justify-content: center;
   gap: 4px;
   overflow: hidden;
   border-radius: 9999px;
   border: 1px solid rgba(71, 85, 105, 0.24);
-  background: rgba(2, 6, 23, 0.78);
+  background: rgba(2, 6, 23, 0.8);
   padding: 2px 7px;
-  font-size: 8px;
+  font-size: 7px;
   line-height: 1;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -975,6 +1123,8 @@ body {
   color: rgba(226, 232, 240, 0.92);
   box-shadow: 0 6px 16px rgba(2, 6, 23, 0.2);
   backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateY(4px) scale(0.96);
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, opacity 180ms ease;
 }
 
@@ -1037,27 +1187,27 @@ body {
 .sim-agent-nameplate {
   position: relative;
   display: inline-flex;
-  min-width: 44px;
-  max-width: 92px;
+  min-width: 40px;
+  max-width: 84px;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   border-radius: 9999px;
-  border: 1px solid rgba(71, 85, 105, 0.24);
-  background: rgba(2, 6, 23, 0.52);
-  padding: 2px 8px;
-  box-shadow: 0 4px 14px rgba(2, 6, 23, 0.14);
-  backdrop-filter: blur(8px);
+  border: 1px solid rgba(71, 85, 105, 0.18);
+  background: rgba(2, 6, 23, 0.44);
+  padding: 2px 7px;
+  box-shadow: 0 4px 12px rgba(2, 6, 23, 0.12);
+  backdrop-filter: blur(7px);
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, opacity 180ms ease;
 }
 
 .sim-agent-name {
   display: inline-block;
-  max-width: 68px;
+  max-width: 60px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 10px;
+  font-size: 9px;
   line-height: 1;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -1075,12 +1225,16 @@ body {
   box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.12), 0 10px 24px rgba(2, 6, 23, 0.18);
 }
 
-.sim-agent:hover .sim-agent-nameplate {
-  border-color: rgba(148, 163, 184, 0.32);
+.sim-agent:hover .sim-agent-nameplate,
+.sim-agent.is-selected .sim-agent-nameplate {
+  border-color: rgba(148, 163, 184, 0.28);
+  background: rgba(2, 6, 23, 0.58);
 }
 
-.sim-agent:hover .sim-agent-status {
-  transform: translateY(-1px);
+.sim-agent:hover .sim-agent-status,
+.sim-agent.is-selected .sim-agent-status {
+  opacity: 1;
+  transform: translateY(-1px) scale(1);
 }
 
 .sim-agent.is-selected .sim-agent-name {
@@ -1098,11 +1252,74 @@ body {
   box-shadow: none;
 }
 
-.office-sim-linknote {
-  max-width: 360px;
-  font-size: 11px;
-  line-height: 1.35;
-  color: rgba(148, 163, 184, 0.84);
+.workspace-scene-notes {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.workspace-scene-note-card {
+  border-radius: 18px;
+  border: 1px solid rgba(51, 65, 85, 0.75);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.62), rgba(2, 6, 23, 0.76));
+  padding: 12px 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.workspace-scene-note-card.is-muted {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(2, 6, 23, 0.62));
+}
+
+.workspace-scene-note-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(100, 116, 139, 0.92);
+}
+
+.workspace-scene-note-text {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(203, 213, 225, 0.92);
+}
+
+.workspace-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(51, 65, 85, 0.85);
+  background: rgba(2, 6, 23, 0.46);
+  padding: 8px 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+}
+
+.workspace-meta-pill.is-muted {
+  border-color: rgba(51, 65, 85, 0.65);
+  background: rgba(2, 6, 23, 0.28);
+}
+
+.workspace-meta-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(100, 116, 139, 0.92);
+}
+
+.workspace-meta-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(248, 250, 252, 0.96);
+}
+
+.workspace-meta-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(103, 232, 249, 0.95);
 }
 
 @keyframes simStatusPulse {
@@ -1405,11 +1622,6 @@ body {
   transform: translateX(-50%) rotate(4deg);
 }
 
-.sim-creature.sim-agent-facing-left .sim-creature-tail {
-  left: 6px;
-  right: auto;
-  transform: scaleX(-1) rotate(28deg);
-}
 
 .sim-creature.sim-agent-facing-left .sim-creature-accessory {
   left: 4px;
@@ -1419,6 +1631,41 @@ body {
 .sim-creature.sim-agent-facing-right .sim-creature-accessory {
   right: 4px;
   left: auto;
+}
+
+.sim-creature.persona-jarvis .sim-creature-body-shell {
+  border-radius: 44% 44% 40% 40% / 50% 50% 36% 36%;
+}
+
+.sim-creature.persona-elon .sim-creature-highlight {
+  width: 24px;
+  transform: rotate(-14deg);
+}
+
+.sim-creature.persona-jensen .sim-creature-eye {
+  animation-duration: 5.8s;
+}
+
+.sim-creature.persona-trinity .sim-creature-blush {
+  opacity: 0.44;
+}
+
+.sim-agent-body.persona-jarvis.sim-agent-float {
+  animation-duration: 3.9s;
+}
+
+.sim-agent-body.persona-elon.sim-agent-walk {
+  animation-duration: 0.62s;
+}
+
+.sim-agent-body.persona-jensen.sim-agent-float,
+.sim-agent-body.persona-jensen.sim-agent-rest {
+  animation-duration: 4.6s;
+}
+
+.sim-agent-body.persona-trinity.sim-agent-present,
+.sim-agent-body.persona-trinity.sim-agent-wait {
+  animation-duration: 2.1s;
 }
 
 .sim-creature.pose-monitor .sim-creature-body-shell,
@@ -1497,6 +1744,20 @@ body {
 
 .sim-creature.pose-break .sim-creature-feet {
   bottom: -3px;
+}
+
+.sim-creature.pose-settling .sim-creature-body-shell {
+  transform: translateX(-50%) rotate(1deg) scaleY(0.98);
+}
+
+.sim-creature.pose-settling .sim-creature-arm-left {
+  top: 34px;
+  transform: rotate(22deg);
+}
+
+.sim-creature.pose-settling .sim-creature-arm-right {
+  top: 34px;
+  transform: rotate(-24deg);
 }
 
 .sim-agent-walk {
@@ -1586,10 +1847,38 @@ body {
   filter: blur(8px) saturate(0.9);
 }
 
+.office-sim.room-watch .office-sim-vignette {
+  opacity: 0.86;
+}
+
+.office-sim.room-watch .office-zone {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 20px 44px rgba(15, 23, 42, 0.18);
+}
+
+.office-sim-shell.is-focused .office-sim-room-note,
+.office-sim-shell.is-native-fullscreen .office-sim-room-note {
+  color: rgba(186, 230, 253, 0.86);
+}
+
+.office-prop.is-ambient {
+  filter: brightness(1.03) saturate(1.02);
+}
+
+.office-prop.is-support {
+  filter: brightness(1.08) saturate(1.08);
+}
+
+.office-prop.is-alert {
+  filter: brightness(1.15) saturate(1.18);
+}
+
 .office-prop.is-engaged {
   filter: brightness(1.12) saturate(1.14);
 }
 
+.office-prop.is-ambient::after,
+.office-prop.is-support::after,
+.office-prop.is-alert::after,
 .office-prop.is-engaged::after {
   box-shadow: 0 0 18px rgba(96, 165, 250, 0.18);
 }
@@ -1601,15 +1890,50 @@ body {
   transform: translateY(-1px);
 }
 
+.office-prop.office-prop-coffee.is-ambient,
+.office-prop.office-prop-coffee.is-support,
 .office-prop.office-prop-coffee.is-engaged {
   animation: propCoffeeSteam 2.8s ease-in-out infinite;
 }
 
+.office-prop.office-prop-lamp.is-ambient,
+.office-prop.office-prop-lamp.is-support,
+.office-prop.office-prop-lamp.is-alert {
+  animation: propLampGlow 3.6s ease-in-out infinite;
+}
+
+.office-prop.office-prop-window.is-ambient,
+.office-prop.office-prop-window.is-support {
+  animation: propWindowShift 8s ease-in-out infinite;
+}
+
+.office-prop.office-prop-plant.is-ambient,
+.office-prop.office-prop-plant.is-support {
+  animation: propPlantSway 6s ease-in-out infinite;
+}
+
+.office-prop.office-prop-server.is-ambient,
+.office-prop.office-prop-server.is-support,
+.office-prop.office-prop-server.is-alert,
+.office-prop.office-prop-server.is-engaged {
+  animation: propServerBlink 1.9s ease-in-out infinite;
+}
+
+.office-prop.office-prop-display.is-ambient,
+.office-prop.office-prop-monitor.is-ambient {
+  animation: propScreenPulse 4.8s ease-in-out infinite;
+}
+
+.office-prop.office-prop-display.is-support,
+.office-prop.office-prop-monitor.is-support,
 .office-prop.office-prop-display.is-engaged,
-.office-prop.office-prop-monitor.is-engaged {
+.office-prop.office-prop-monitor.is-engaged,
+.office-prop.office-prop-display.is-alert {
   animation: propScreenPulse 2.2s ease-in-out infinite;
 }
 
+.office-prop.office-prop-whiteboard.is-ambient,
+.office-prop.office-prop-whiteboard.is-support,
 .office-prop.office-prop-whiteboard.is-engaged {
   animation: propWhiteboardGlow 2.8s ease-in-out infinite;
 }
@@ -1655,6 +1979,10 @@ body {
   animation: simAgentRest 3.6s ease-in-out infinite;
 }
 
+.sim-agent-settle {
+  animation: simAgentSettle 0.9s ease-out;
+}
+
 @keyframes simAgentWait {
   0%,
   100% {
@@ -1684,6 +2012,15 @@ body {
   50% {
     transform: translateY(-1px);
     opacity: 0.88;
+  }
+}
+
+@keyframes simAgentSettle {
+  0% {
+    transform: translateY(-4px) scale(1.02);
+  }
+  100% {
+    transform: translateY(0px) scale(1);
   }
 }
 
@@ -1719,6 +2056,71 @@ body {
   }
 }
 
+@keyframes propLampGlow {
+  0%,
+  100% {
+    opacity: 0.86;
+    filter: drop-shadow(0 0 0 rgba(250, 204, 21, 0.08));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.22));
+  }
+}
+
+@keyframes propWindowShift {
+  0%,
+  100% {
+    transform: translateX(0px);
+    opacity: 0.84;
+  }
+  50% {
+    transform: translateX(0.3px);
+    opacity: 0.96;
+  }
+}
+
+@keyframes propPlantSway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(1.2deg);
+  }
+}
+
+@keyframes propServerBlink {
+  0%,
+  100% {
+    filter: brightness(1.02) saturate(1.02);
+  }
+  50% {
+    filter: brightness(1.16) saturate(1.14);
+  }
+}
+
+@keyframes officeDustDrift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-1.5%, 1.2%, 0);
+  }
+}
+
+@keyframes officeHazeBreath {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.72;
+    transform: scale(1.02);
+  }
+}
+
 @media (max-width: 1200px) {
   .office-sim {
     aspect-ratio: 18 / 11;
@@ -1742,6 +2144,10 @@ body {
     left: 3%;
     right: 3%;
     top: 3%;
+  }
+
+  .office-sim-headerdock {
+    max-width: min(82%, 520px);
   }
 }
 
@@ -1788,10 +2194,16 @@ body {
   .sim-agent-wait,
   .sim-agent-present,
   .sim-agent-rest,
+  .sim-agent-settle,
   .office-handoff-line,
   .sim-agent-status-dot,
   .sim-creature-eye,
-  .office-prop.is-engaged {
+  .office-sim-atmosphere,
+  .office-sim-haze,
+  .office-prop.is-engaged,
+  .office-prop.is-ambient,
+  .office-prop.is-support,
+  .office-prop.is-alert {
     animation: none !important;
   }
 }
