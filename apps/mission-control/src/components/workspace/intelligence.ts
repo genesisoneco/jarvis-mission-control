@@ -1,4 +1,4 @@
-import type { EventItem, TaskHint, TaskHintId } from './types'
+import type { EventItem, TaskHint, TaskHintId, WorkspaceAgent } from './types'
 
 type SessionLike = {
   key: string
@@ -129,6 +129,25 @@ export function deriveTaskHints(agentId: string, session: SessionLike, events: E
       confidence: meta.score >= 9 ? 'high' : meta.score >= 5 ? 'medium' : 'low',
       source: meta.source,
     }))
+}
+
+export function pickActivityEmoji(agent: Pick<WorkspaceAgent, 'activityState' | 'sceneState' | 'primaryTaskHint'>) {
+  const hintId = agent.primaryTaskHint?.id
+
+  if (agent.activityState === 'collaborating') return '🤝'
+  if (agent.activityState === 'waiting_input') return '⏳'
+  if (agent.activityState === 'cooldown') return '☕️'
+
+  if (agent.sceneState === 'blocked') return '🚨'
+
+  if (hintId === 'coding') return '💻'
+  if (hintId === 'research') return '🔍'
+  if (hintId === 'communications' || hintId === 'drafting') return '✏️'
+  if (hintId === 'incident-response') return '🚨'
+  if (hintId === 'queue-triage') return '📊'
+  if (hintId === 'monitoring') return '📺'
+
+  return null
 }
 
 export function attentionAgentMatch(item: AttentionItem) {

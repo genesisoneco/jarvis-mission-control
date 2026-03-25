@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { Activity, AlertTriangle, Coffee, Cpu, Maximize2, Minimize2, Radio } from 'lucide-react'
 import { buildWaypointPath, homeZoneByAgent, intentZone, nearestWaypoint, pointDistance, prioritizedPropsForAgent, waypointPositions, zoneById, zoneDefinitions, type Point, type ZoneId } from './workspace/scene'
 import type { EventItem, Health, Presence, WorkspaceAgent, WorkspaceHandoff } from './workspace/types'
+import { pickActivityEmoji } from './workspace/intelligence'
 
 type Props = {
   agents: WorkspaceAgent[]
@@ -491,6 +492,8 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
   const [beat, setBeat] = useState(0)
   const [motion, setMotion] = useState<Record<string, AgentMotionState>>({})
   const [isFallbackFocused, setIsFallbackFocused] = useState(false)
+  const [ambientMode, setAmbientMode] = useState<'calm' | 'playful'>('calm')
+  const [moodBubbles, setMoodBubbles] = useState<Record<string, { emoji: string; untilBeat: number } | null>>({})
   const [isBrowserFullscreen, setIsBrowserFullscreen] = useState(false)
   const motionRef = useRef<Record<string, AgentMotionState>>({})
   const workspaceShellRef = useRef<HTMLDivElement | null>(null)
@@ -728,6 +731,14 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
                 <span className="office-sim-statpill">{agents.reduce((sum, agent) => sum + agent.signalCount, 0)} markers</span>
                 {visibleHandoffs.length > 0 ? <span className="office-sim-statpill">{visibleHandoffs.length} linked</span> : null}
                 {isWorkspaceFocused ? <span className="office-sim-statpill">Esc to exit focus</span> : null}
+                <button
+                  type="button"
+                  onClick={() => setAmbientMode((mode) => (mode === 'calm' ? 'playful' : 'calm'))}
+                  className="office-sim-statpill ambient-toggle"
+                  title="Toggle ambient emoji mode"
+                >
+                  {ambientMode === 'calm' ? 'Calm mode' : 'Playful mode'}
+                </button>
               </div>
             </div>
 
@@ -797,6 +808,9 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
               const isSettling = Boolean(state && !state.isMoving && beat <= state.settleUntilBeat)
               const pose = poseForMotion(targetZone, state?.action ?? agent.interactionLabel, isMoving, agent.activityState, isSettling)
               const placement = placementForZone(targetZone)
+              const activityEmoji = pickActivityEmoji(agent)
+              const moodState = moodBubbles[agent.id]
+              const showMood = ambientMode === 'playful' && moodState && beat <= moodState.untilBeat
               const motionClass = agent.sceneState === 'blocked'
                 ? 'sim-agent-shake'
                 : isMoving
@@ -831,8 +845,23 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
                         </span>
                         <div className="sim-agent-nameplate">
                           <span className="sim-agent-name">{agent.name}</span>
+                          {agent.explicitActivityLabel || agent.activityState !== 'idle' ? (
+                            <span className="sim-agent-subtitle">
+                              {agent.explicitActivityLabel
+                                || (agent.activityState === 'working' && 'Working')
+                                || (agent.activityState === 'collaborating' && 'Collaborating')
+                                || (agent.activityState === 'waiting_input' && 'Waiting for input')
+                                || (agent.activityState === 'cooldown' && 'Cooling down')
+                                || ''}
+                            </span>
+                          ) : null}
                         </div>
                       </div>
+                      {(activityEmoji || showMood) ? (
+                        <div className="sim-agent-thought-bubble">
+                          <span className="sim-agent-thought-emoji">{showMood ? moodState?.emoji : activityEmoji}</span>
+                        </div>
+                      ) : null}
                       {selectedAgent ? <div className="sim-agent-taskline">{state?.action ?? agent.interactionLabel}</div> : null}
                     </div>
                   </div>
