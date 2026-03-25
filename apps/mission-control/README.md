@@ -108,3 +108,4 @@ npm run build
 - `../../docs/mission-control/mission-control-v1.md`
 - `../../docs/mission-control/mission-control-architecture.md`
 - `../../docs/mission-control/private-live-deployment.md`
+- `../../docs/mission-control/virtual-workspace-v2-ambient-ui.md`
