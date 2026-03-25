@@ -845,10 +845,10 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
                         </span>
                         <div className="sim-agent-nameplate">
                           <span className="sim-agent-name">{agent.name}</span>
-                          {agent.explicitActivityLabel || agent.activityState !== 'idle' ? (
+                          {(agent.freshestSession?.explicitActivityLabel || agent.activityState !== 'idle') ? (
                             <span className="sim-agent-subtitle">
-                              {agent.explicitActivityLabel
-                                || (agent.activityState === 'working' && 'Working')
+                              {agent.freshestSession?.explicitActivityLabel
+                                || (agent.activityState === 'executing' && 'Working')
                                 || (agent.activityState === 'collaborating' && 'Collaborating')
                                 || (agent.activityState === 'waiting_input' && 'Waiting for input')
                                 || (agent.activityState === 'cooldown' && 'Cooling down')

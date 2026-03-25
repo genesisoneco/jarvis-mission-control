@@ -1201,6 +1201,16 @@ body {
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, opacity 180ms ease;
 }
 
+.sim-agent-subtitle {
+  display: block;
+  margin-top: 3px;
+  font-size: 8px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(148, 163, 184, 0.9);
+}
+
 .sim-agent-name {
   display: inline-block;
   max-width: 60px;
