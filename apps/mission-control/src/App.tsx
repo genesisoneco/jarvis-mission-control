@@ -185,6 +185,10 @@ type OverviewResponse = {
     health?: {
       channels?: Record<string, { configured?: boolean; running?: boolean }>
     }
+    gatewayStatus?: {
+      rpc?: { ok?: boolean }
+      gateway?: { probeUrl?: string }
+    }
     routingPolicy?: {
       owner?: string
       lanes?: {
@@ -287,6 +291,20 @@ async function logout() {
     credentials: 'include',
   })
   window.location.href = `${import.meta.env.BASE_URL}login`
+}
+
+async function restartGatewayAction() {
+  const response = await fetch(`${import.meta.env.BASE_URL}api/actions/restart-gateway`, {
+    method: 'POST',
+    credentials: 'include',
+  })
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.error || `Gateway restart failed (${response.status})`)
+  }
+
+  return response.json()
 }
 
 function formatRelativeMs(ageMs: number | null | undefined) {
@@ -797,7 +815,7 @@ function App() {
           <div>
             <p className="mb-2 text-xs uppercase tracking-[0.3em] text-cyan-300">Richard&apos;s Enterprise Dashboard</p>
             <h1 className="text-3xl font-semibold text-white">Jarvis Mission Control</h1>
-            <p className="mt-2 max-w-3xl text-sm text-slate-400">Live signal view of health, agents, automations, and intervention points. Built for fast decisions, not dashboard theater.</p>
+            <p className="mt-2 max-w-3xl text-sm text-slate-400">Operational cockpit for Jarvis and sub-agents: live room state up top, intervention queues below, and enough runtime context to make fast decisions without drowning in dashboard sludge.</p>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-500">
               <span>{data?.fetchedAt ? `Last refresh: ${new Date(data.fetchedAt).toLocaleString()}` : 'Waiting for first live snapshot...'}</span>
               {isLive ? (
@@ -816,9 +834,9 @@ function App() {
                 <LogOut className="h-4 w-4" /> Log out
               </button>
             ) : (
-              <button className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-cyan-400">
-                <Zap className="h-4 w-4" /> Quick actions
-              </button>
+              <div className="inline-flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-200">
+                <Zap className="h-4 w-4" /> Preview snapshot mode
+              </div>
             )}
           </div>
         </header>
@@ -1065,27 +1083,47 @@ function App() {
             <Panel title="Controls & safety" icon={<ShieldAlert className="h-4 w-4" />}>
               <div className="space-y-5">
                 <div>
-                  <div className="mb-3 text-[11px] font-medium uppercase tracking-[0.24em] text-slate-500">Quick actions</div>
-                  <div className="space-y-3">
-                    <ActionButton label="Restart gateway" />
-                    <ActionButton label="Retry failed cron" />
-                    <ActionButton label="Kill stuck session" />
-                    <ActionButton label="Open approval queue" />
+                  <div className="mb-3 text-[11px] font-medium uppercase tracking-[0.24em] text-slate-500">Ops posture</div>
+                  <div className="grid gap-3">
+                    <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-[11px] uppercase tracking-wide text-slate-500">Gateway</div>
+                          <div className="mt-1 text-sm text-slate-200">{data?.raw?.gatewayStatus?.rpc?.ok ? 'Reachable on local loopback' : 'Needs attention'}</div>
+                          <div className="mt-1 text-xs text-slate-500">{data?.raw?.gatewayStatus?.gateway?.probeUrl ?? 'Probe unavailable'}</div>
+                        </div>
+                        {isLive ? <ActionButton label="Restart gateway" onClick={restartGatewayAction} /> : null}
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+                      <div className="text-[11px] uppercase tracking-wide text-slate-500">Session safety</div>
+                      <div className="mt-1 text-sm text-slate-200">Tier 1 actions still require explicit confirmation.</div>
+                      <div className="mt-1 text-xs text-slate-500">Exact commands should be preserved for approvals, not paraphrased.</div>
+                    </div>
+                    <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+                      <div className="text-[11px] uppercase tracking-wide text-slate-500">Control surface</div>
+                      <div className="mt-1 text-sm text-slate-200">Mission Control reads local OpenClaw state through a thin adapter API.</div>
+                      <div className="mt-1 text-xs text-slate-500">Good for monitoring and guided intervention; not a license for blind button-mashing.</div>
+                    </div>
                   </div>
                 </div>
 
                 <div>
-                  <div className="mb-3 text-[11px] font-medium uppercase tracking-[0.24em] text-slate-500">Guardrails</div>
+                  <div className="mb-3 text-[11px] font-medium uppercase tracking-[0.24em] text-slate-500">Access mode</div>
                   <ul className="space-y-3 text-sm text-slate-300">
-                    <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">Tier 1 actions require explicit confirmation.</li>
-                    <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">Preserve exact commands for approvals.</li>
-                    <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">The dashboard reads local OpenClaw state through a thin adapter API.</li>
                     {data?.auth ? (
                       <li className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
-                        Access mode: <span className="font-medium text-emerald-300">{data.auth.via}</span>
+                        <div>
+                          Access mode: <span className="font-medium text-emerald-300">{data.auth.via}</span>
+                        </div>
                         {data.auth.publicOrigin ? <div className="mt-1 text-slate-400">Origin: {data.auth.publicOrigin}</div> : null}
                       </li>
-                    ) : null}
+                    ) : (
+                      <li className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-amber-100">
+                        Preview snapshot only. Live runtime controls stay behind authenticated local access.
+                      </li>
+                    )}
+                    <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">If something looks scary, verify the runtime first. A noisy UI is often a client problem, not a gateway disaster.</li>
                   </ul>
                 </div>
               </div>
@@ -1153,8 +1191,15 @@ function AttentionCard({ title, detail }: { title: string; detail: string }) {
   )
 }
 
-function ActionButton({ label }: { label: string }) {
-  return <button className="w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-left text-sm text-slate-200 transition hover:bg-slate-800">{label}</button>
+function ActionButton({ label, onClick }: { label: string; onClick?: () => void | Promise<void> }) {
+  return (
+    <button
+      onClick={() => void onClick?.()}
+      className="w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-left text-sm text-slate-200 transition hover:bg-slate-800"
+    >
+      {label}
+    </button>
+  )
 }
 
 function MutedBlock({ text }: { text: string }) {

@@ -639,6 +639,24 @@ app.post('/auth/logout', (req, res) => {
 
 app.use('/api', ensureAuthenticated)
 
+app.post('/api/actions/restart-gateway', async (_req, res) => {
+  try {
+    const result = await safeRun(['gateway', 'restart'], { ok: false, error: 'Restart command failed.' })
+    res.json({
+      ok: true,
+      action: 'restart-gateway',
+      result,
+      at: new Date().toISOString(),
+    })
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      action: 'restart-gateway',
+      error: error instanceof Error ? error.message : String(error),
+    })
+  }
+})
+
 app.get('/api/overview', async (_req, res) => {
   try {
     const [status, gatewayStatus, health, sessionsResult, cronJobsStore, latestLogPath] = await Promise.all([

@@ -493,7 +493,7 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
   const [motion, setMotion] = useState<Record<string, AgentMotionState>>({})
   const [isFallbackFocused, setIsFallbackFocused] = useState(false)
   const [ambientMode, setAmbientMode] = useState<'calm' | 'playful'>('calm')
-  const [moodBubbles, setMoodBubbles] = useState<Record<string, { emoji: string; untilBeat: number } | null>>({})
+  const [moodBubbles, setMoodBubbles] = useState<Record<string, { emoji: string; untilBeat: number; nextEligibleBeat: number } | null>>({})
   const [isBrowserFullscreen, setIsBrowserFullscreen] = useState(false)
   const motionRef = useRef<Record<string, AgentMotionState>>({})
   const workspaceShellRef = useRef<HTMLDivElement | null>(null)
@@ -688,6 +688,56 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
     return () => window.cancelAnimationFrame(frame)
   }, [agents, beat, handoffSet])
 
+  useEffect(() => {
+    if (agents.length === 0) return
+
+    let changed = false
+    const next: Record<string, { emoji: string; untilBeat: number; nextEligibleBeat: number } | null> = { ...moodBubbles }
+
+    agents.forEach((agent) => {
+      const existing = next[agent.id]
+      if (existing && beat <= existing.untilBeat) return
+
+      const activityEmoji = pickActivityEmoji(agent)
+      const emotionalEmoji =
+        agent.sceneState === 'blocked'
+          ? '⚠️'
+          : agent.activityState === 'waiting_input'
+            ? '⏳'
+            : agent.activityState === 'collaborating'
+              ? '🤝'
+              : agent.activityState === 'cooldown'
+                ? '☕'
+                : activityEmoji
+
+      const forcedByState =
+        agent.sceneState === 'blocked'
+        || agent.activityState === 'waiting_input'
+        || agent.activityState === 'collaborating'
+
+      const eligibleBeat = existing?.nextEligibleBeat ?? 0
+      const randomPulse = beat >= eligibleBeat && ((beat + agentSeed(agent.id)) % (ambientMode === 'playful' ? 2 : 4) === 0)
+      const shouldShow = Boolean(emotionalEmoji) && (forcedByState || randomPulse)
+
+      const nextBubble = shouldShow
+        ? {
+            emoji: emotionalEmoji || '💭',
+            untilBeat: beat + 1,
+            nextEligibleBeat: beat + (forcedByState ? 2 : ambientMode === 'playful' ? 3 : 5),
+          }
+        : null
+
+      if (JSON.stringify(nextBubble) !== JSON.stringify(existing ?? null)) {
+        next[agent.id] = nextBubble
+        changed = true
+      }
+    })
+
+    if (changed) {
+      setMoodBubbles(next)
+    }
+  }, [agents, ambientMode, beat, moodBubbles])
+
   const selected = agents.find((agent) => agent.id === selectedAgentId) ?? agents[0]
   const selectedMotion = selected ? motion[selected.id] : null
   const roomProfile = useMemo(() => roomModeProfile(agents, handoffs, events, isWorkspaceFocused), [agents, handoffs, events, isWorkspaceFocused])
@@ -727,18 +777,6 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
             <div className="office-sim-headerbar">
               <div className="office-sim-headerdock">
                 <span className="office-sim-headerchip">{roomProfile.label}</span>
-                <span className="office-sim-statpill">{isLive ? 'Live feed' : 'Preview feed'}</span>
-                <span className="office-sim-statpill">{agents.reduce((sum, agent) => sum + agent.signalCount, 0)} markers</span>
-                {visibleHandoffs.length > 0 ? <span className="office-sim-statpill">{visibleHandoffs.length} linked</span> : null}
-                {isWorkspaceFocused ? <span className="office-sim-statpill">Esc to exit focus</span> : null}
-                <button
-                  type="button"
-                  onClick={() => setAmbientMode((mode) => (mode === 'calm' ? 'playful' : 'calm'))}
-                  className="office-sim-statpill ambient-toggle"
-                  title="Toggle ambient emoji mode"
-                >
-                  {ambientMode === 'calm' ? 'Calm mode' : 'Playful mode'}
-                </button>
               </div>
             </div>
 
@@ -810,7 +848,7 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
               const placement = placementForZone(targetZone)
               const activityEmoji = pickActivityEmoji(agent)
               const moodState = moodBubbles[agent.id]
-              const showMood = ambientMode === 'playful' && moodState && beat <= moodState.untilBeat
+              const showMood = Boolean(moodState && beat <= moodState.untilBeat)
               const motionClass = agent.sceneState === 'blocked'
                 ? 'sim-agent-shake'
                 : isMoving
@@ -841,28 +879,28 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
                       <div className="sim-agent-status-stack">
                         <span className={`sim-agent-status ${sceneStatusTone(agent.sceneState)}`}>
                           <span className="sim-agent-status-dot" />
-                          {agent.sceneLabel}
+                          {agent.sceneLabel === 'Executing' ? 'Working' : agent.sceneLabel}
                         </span>
                         <div className="sim-agent-nameplate">
-                          <span className="sim-agent-name">{agent.name}</span>
-                          {(agent.freshestSession?.explicitActivityLabel || agent.activityState !== 'idle') ? (
-                            <span className="sim-agent-subtitle">
+                          <div className="sim-agent-name">{agent.name}</div>
+                          {agent.id !== 'jarvis' && (agent.freshestSession?.explicitActivityLabel || agent.activityState !== 'idle') ? (
+                            <div className="sim-agent-subtitle">
                               {agent.freshestSession?.explicitActivityLabel
                                 || (agent.activityState === 'executing' && 'Working')
                                 || (agent.activityState === 'collaborating' && 'Collaborating')
                                 || (agent.activityState === 'waiting_input' && 'Waiting for input')
                                 || (agent.activityState === 'cooldown' && 'Cooling down')
                                 || ''}
-                            </span>
+                            </div>
                           ) : null}
                         </div>
                       </div>
-                      {(activityEmoji || showMood) ? (
-                        <div className="sim-agent-thought-bubble">
-                          <span className="sim-agent-thought-emoji">{showMood ? moodState?.emoji : activityEmoji}</span>
+                      {showMood ? (
+                        <div className={`sim-agent-thought-bubble ${personalityClass(agent.id)} is-visible`}>
+                          <span className="sim-agent-thought-emoji">{moodState?.emoji}</span>
                         </div>
                       ) : null}
-                      {selectedAgent ? <div className="sim-agent-taskline">{state?.action ?? agent.interactionLabel}</div> : null}
+                      <div className={`sim-agent-taskline ${selectedAgent ? 'is-selected' : ''}`}>{state?.action ?? agent.interactionLabel}</div>
                     </div>
                   </div>
                 </button>
@@ -911,20 +949,6 @@ export default function VirtualWorkspace({ agents, handoffs, events, isLive, sel
           ))}
         </div>
 
-        <div className="workspace-scene-notes">
-          <div className="workspace-scene-note-card">
-            <div className="workspace-scene-note-label">Scene read</div>
-            <div className="workspace-scene-note-text">{roomProfile.note}</div>
-          </div>
-          <div className="workspace-scene-note-card is-muted">
-            <div className="workspace-scene-note-label">Link policy</div>
-            <div className="workspace-scene-note-text">
-              {visibleHandoffs.length > 0
-                ? 'Dotted blue links only appear for explicit collaboration or handoff relationships.'
-                : 'No explicit collaboration link is active right now, so the scene stays visually clean.'}
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr_0.85fr]">

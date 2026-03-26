@@ -12,7 +12,7 @@ export type ZoneId =
 
 export type Point = { x: number; y: number }
 
-type PropType = 'desk' | 'monitor' | 'table' | 'plant' | 'coffee' | 'display' | 'sofa' | 'shelf' | 'lamp' | 'rug' | 'window' | 'chair' | 'cabinet' | 'whiteboard' | 'server'
+type PropType = 'desk' | 'monitor' | 'table' | 'plant' | 'coffee' | 'display' | 'sofa' | 'shelf' | 'lamp' | 'rug' | 'window' | 'chair' | 'cabinet' | 'whiteboard' | 'server' | 'docs' | 'tablet' | 'mail' | 'toolkit' | 'books'
 
 export type ZoneProp = {
   id: string
@@ -60,6 +60,10 @@ export const zoneDefinitions: Zone[] = [
       { id: 'cmd-lamp', type: 'lamp', x: 25.1, y: 18.7, w: 1.8, h: 5.1 },
       { id: 'cmd-plant', type: 'plant', x: 10.1, y: 16, w: 3.1, h: 5 },
       { id: 'cmd-coffee', type: 'coffee', x: 22.2, y: 21.8, w: 2.2, h: 2.2 },
+      { id: 'cmd-coffee-side', type: 'coffee', x: 16.2, y: 21.6, w: 1.8, h: 1.8 },
+      { id: 'cmd-coffee-front', type: 'coffee', x: 19.6, y: 22.3, w: 1.9, h: 1.9 },
+      { id: 'cmd-docs', type: 'docs', x: 16.9, y: 19.4, w: 3.2, h: 1.6 },
+      { id: 'cmd-tablet', type: 'tablet', x: 21.0, y: 19.2, w: 2.2, h: 1.5 },
     ],
     seats: [{ x: 18, y: 26 }],
   },
@@ -88,6 +92,10 @@ export const zoneDefinitions: Zone[] = [
       { id: 'eng-lamp', type: 'lamp', x: 74.3, y: 19.1, w: 1.8, h: 5.1 },
       { id: 'eng-cabinet', type: 'cabinet', x: 88.2, y: 24.5, w: 3, h: 3.2 },
       { id: 'eng-coffee', type: 'coffee', x: 85.7, y: 21.5, w: 2.1, h: 2.1 },
+      { id: 'eng-coffee-side', type: 'coffee', x: 78.1, y: 21.5, w: 1.9, h: 1.9 },
+      { id: 'eng-coffee-front', type: 'coffee', x: 82.9, y: 22.2, w: 1.9, h: 1.9 },
+      { id: 'eng-toolkit', type: 'toolkit', x: 77.8, y: 19.2, w: 3.4, h: 1.8 },
+      { id: 'eng-tablet', type: 'tablet', x: 83.8, y: 19.1, w: 2.2, h: 1.5 },
     ],
     seats: [{ x: 82, y: 26 }],
   },
@@ -114,6 +122,10 @@ export const zoneDefinitions: Zone[] = [
       { id: 'res-plant', type: 'plant', x: 10.2, y: 68.9, w: 3, h: 5 },
       { id: 'res-plant-2', type: 'plant', x: 12.1, y: 77.1, w: 3, h: 5 },
       { id: 'res-coffee', type: 'coffee', x: 21.2, y: 73.8, w: 2.1, h: 2.1 },
+      { id: 'res-coffee-side', type: 'coffee', x: 16.8, y: 73.6, w: 1.8, h: 1.8 },
+      { id: 'res-coffee-front', type: 'coffee', x: 19.8, y: 74.4, w: 1.8, h: 1.8 },
+      { id: 'res-books', type: 'books', x: 17.0, y: 70.8, w: 3.2, h: 1.8 },
+      { id: 'res-docs', type: 'docs', x: 21.1, y: 70.9, w: 2.7, h: 1.5 },
     ],
     seats: [{ x: 20, y: 78 }],
   },
@@ -140,6 +152,10 @@ export const zoneDefinitions: Zone[] = [
       { id: 'comms-plant', type: 'plant', x: 88, y: 69, w: 3, h: 5 },
       { id: 'comms-coffee', type: 'coffee', x: 86, y: 76, w: 2.2, h: 2.2 },
       { id: 'comms-coffee-guest', type: 'coffee', x: 74.8, y: 74.7, w: 1.9, h: 1.9 },
+      { id: 'comms-coffee-rose', type: 'coffee', x: 80.9, y: 73.6, w: 1.8, h: 1.8 },
+      { id: 'comms-coffee-front', type: 'coffee', x: 83.2, y: 74.4, w: 1.8, h: 1.8 },
+      { id: 'comms-mail', type: 'mail', x: 78.3, y: 70.9, w: 3.2, h: 1.8 },
+      { id: 'comms-tablet', type: 'tablet', x: 82.4, y: 70.8, w: 2.1, h: 1.5 },
     ],
     seats: [{ x: 82, y: 78 }],
   },
@@ -164,6 +180,7 @@ export const zoneDefinitions: Zone[] = [
       { id: 'meeting-chair-3', type: 'chair', x: 47.6, y: 41.6, w: 3.2, h: 2.6 },
       { id: 'meeting-chair-4', type: 'chair', x: 47.6, y: 52.9, w: 3.2, h: 2.6 },
       { id: 'meeting-coffee', type: 'coffee', x: 56.9, y: 46.6, w: 1.8, h: 1.8 },
+      { id: 'meeting-docs', type: 'docs', x: 47.1, y: 46.5, w: 3.6, h: 1.8 },
     ],
     seats: [
       { x: 42, y: 48 },
@@ -192,6 +209,7 @@ export const zoneDefinitions: Zone[] = [
       { id: 'alert-server-right', type: 'server', x: 61.2, y: 13.6, w: 2.3, h: 7.3 },
       { id: 'alert-lamp', type: 'lamp', x: 56.9, y: 14.9, w: 2, h: 5 },
       { id: 'alert-coffee', type: 'coffee', x: 54.6, y: 19.2, w: 1.8, h: 1.8 },
+      { id: 'alert-tablet', type: 'tablet', x: 48.8, y: 19.1, w: 2.2, h: 1.5 },
     ],
     seats: [{ x: 50, y: 22 }],
   },
@@ -215,6 +233,7 @@ export const zoneDefinitions: Zone[] = [
       { id: 'break-cabinet', type: 'cabinet', x: 56, y: 74, w: 4, h: 4 },
       { id: 'break-lamp', type: 'lamp', x: 54, y: 77, w: 2, h: 5 },
       { id: 'break-plant', type: 'plant', x: 56, y: 78, w: 3, h: 5 },
+      { id: 'break-books', type: 'books', x: 47.2, y: 80.2, w: 3.0, h: 1.6 },
     ],
     seats: [{ x: 46, y: 82 }, { x: 54, y: 82 }],
   },
@@ -253,7 +272,7 @@ export const waypointGraph: Record<string, string[]> = {
 
 const zonePropPriorityByAgent: Record<string, Partial<Record<ZoneId, string[]>>> = {
   jarvis: {
-    'command-desk': ['cmd-monitor', 'cmd-desk', 'cmd-whiteboard', 'cmd-cabinet', 'cmd-coffee'],
+    'command-desk': ['cmd-tablet', 'cmd-docs', 'cmd-monitor', 'cmd-desk', 'cmd-whiteboard', 'cmd-cabinet', 'cmd-coffee'],
     'meeting-area': ['meeting-table', 'meeting-display'],
     'alert-wall': ['alert-display', 'alert-console'],
     'break-area': ['break-coffee', 'break-sofa'],

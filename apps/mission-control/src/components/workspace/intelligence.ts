@@ -131,23 +131,71 @@ export function deriveTaskHints(agentId: string, session: SessionLike, events: E
     }))
 }
 
-export function pickActivityEmoji(agent: Pick<WorkspaceAgent, 'activityState' | 'sceneState' | 'primaryTaskHint'>) {
+export function pickActivityEmoji(agent: Pick<WorkspaceAgent, 'id' | 'activityState' | 'sceneState' | 'primaryTaskHint'>) {
   const hintId = agent.primaryTaskHint?.id
 
-  if (agent.activityState === 'collaborating') return '🤝'
-  if (agent.activityState === 'waiting_input') return '⏳'
-  if (agent.activityState === 'cooldown') return '☕️'
+  const pools: Record<string, Partial<Record<string, string[]>>> = {
+    jarvis: {
+      collaborating: ['🧠', '🤝', '📡'],
+      waiting_input: ['⏳', '🫡'],
+      cooldown: ['☕', '🧊'],
+      blocked: ['⚠️', '🚨'],
+      orchestration: ['🧭', '🎛️', '📡'],
+      monitoring: ['👁️', '📈', '🛰️'],
+      incident: ['🚨', '🛡️'],
+      queue: ['📋', '🗂️'],
+    },
+    elon: {
+      collaborating: ['🛠️', '🤝'],
+      waiting_input: ['⏳', '🔧'],
+      cooldown: ['☕', '🧃'],
+      blocked: ['⚠️', '💥'],
+      coding: ['💻', '🛠️', '⚙️'],
+      monitoring: ['📈', '🔍'],
+      incident: ['🔥', '🚨'],
+      queue: ['📦', '🧰'],
+    },
+    jensen: {
+      collaborating: ['🔎', '🤝'],
+      waiting_input: ['⏳', '📝'],
+      cooldown: ['☕', '🌿'],
+      blocked: ['⚠️', '🧩'],
+      research: ['🔎', '📚', '🧪'],
+      monitoring: ['📊', '👁️'],
+      incident: ['🚨', '🔬'],
+      queue: ['🗂️', '📋'],
+    },
+    trinity: {
+      collaborating: ['💬', '💞', '✨'],
+      waiting_input: ['⏳', '💌'],
+      cooldown: ['☕', '🫖', '🌸'],
+      blocked: ['⚠️', '💢'],
+      communications: ['💬', '💌', '📨'],
+      drafting: ['📝', '💖', '🪄'],
+      monitoring: ['👀', '📋'],
+      incident: ['🚨', '📣'],
+      queue: ['📬', '🗒️'],
+    },
+  }
 
-  if (agent.sceneState === 'blocked') return '🚨'
+  const pool = pools[agent.id] ?? {}
+  const pick = (values?: string[]) => (values && values.length > 0 ? values[0] : null)
 
-  if (hintId === 'coding') return '💻'
-  if (hintId === 'research') return '🔍'
-  if (hintId === 'communications' || hintId === 'drafting') return '✏️'
-  if (hintId === 'incident-response') return '🚨'
-  if (hintId === 'queue-triage') return '📊'
-  if (hintId === 'monitoring') return '📺'
+  if (agent.activityState === 'collaborating') return pick(pool.collaborating)
+  if (agent.activityState === 'waiting_input') return pick(pool.waiting_input)
+  if (agent.activityState === 'cooldown') return pick(pool.cooldown)
+  if (agent.sceneState === 'blocked') return pick(pool.blocked)
 
-  return null
+  if (hintId === 'coding') return pick(pool.coding)
+  if (hintId === 'research') return pick(pool.research)
+  if (hintId === 'communications') return pick(pool.communications)
+  if (hintId === 'drafting') return pick(pool.drafting)
+  if (hintId === 'incident-response') return pick(pool.incident)
+  if (hintId === 'queue-triage') return pick(pool.queue)
+  if (hintId === 'monitoring') return pick(pool.monitoring)
+  if (hintId === 'orchestration') return pick(pool.orchestration)
+
+  return pick(pool.monitoring) ?? null
 }
 
 export function attentionAgentMatch(item: AttentionItem) {
