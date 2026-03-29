@@ -1,0 +1,29 @@
+﻿{
+    "updatedAt":  "2026-03-29T20:11:58.4931490+09:00",
+    "equityUsd":  70,
+    "pnlUsd":  0,
+    "pnlPct":  0,
+    "solBalance":  0.008524663,
+    "usdcBalance":  69.3,
+    "netSolAccumulated":  0.008524663,
+    "tradeCount":  1,
+    "latestTrade":  {
+                        "fillId":  "da3906d3-62cb-40d3-b40b-167bd4af19cb",
+                        "intentId":  "95b90869-801d-48cb-8b90-e4ed88e6213e",
+                        "timestamp":  "2026-03-29T10:23:24.059Z",
+                        "baseSymbol":  "SOL",
+                        "quoteSymbol":  "USDC",
+                        "notionalUsdRequested":  0.7000000000000001,
+                        "notionalUsdExecuted":  0.7000000000000001,
+                        "sizeSolExecuted":  0.008524663,
+                        "avgPriceUsd":  82.11468300858346,
+                        "slippageBpsSimulated":  50,
+                        "feesUsdSimulated":  0
+                    },
+    "recommendations":  [
+                            "Sample size is tiny; do not change live strategy based on current data.",
+                            "No realized paper edge yet; continue gathering data before changing core logic.",
+                            "Small-bankroll simulation is heavily constrained by percent caps; consider a parallel larger paper account for strategy validation.",
+                            "Cluster DCA_BUY/RANGE: trades=1, totalNotionalUsd=10"
+                        ]
+}

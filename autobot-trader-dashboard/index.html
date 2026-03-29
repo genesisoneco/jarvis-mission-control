@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autobot Trader Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">SOL PAPER TRADING</div>
+        <h1>Autobot Trader</h1>
+        <p class="sub">Live-ish static status page generated from the local paper simulation.</p>
+      </div>
+      <div class="badge" id="updatedAt">Updating…</div>
+    </header>
+
+    <section class="grid stats">
+      <article class="card stat"><span>Equity</span><strong id="equityUsd">—</strong></article>
+      <article class="card stat"><span>P/L</span><strong id="pnlUsd">—</strong><small id="pnlPct">—</small></article>
+      <article class="card stat"><span>SOL</span><strong id="solBalance">—</strong></article>
+      <article class="card stat"><span>USDC</span><strong id="usdcBalance">—</strong></article>
+      <article class="card stat"><span>Trades</span><strong id="tradeCount">—</strong></article>
+      <article class="card stat"><span>Net SOL</span><strong id="netSol">—</strong></article>
+    </section>
+
+    <section class="grid two-up">
+      <article class="card">
+        <h2>Latest trade</h2>
+        <div id="latestTrade" class="kv-list"></div>
+      </article>
+      <article class="card">
+        <h2>Recommendations</h2>
+        <ul id="recommendations" class="notes"></ul>
+      </article>
+    </section>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>
