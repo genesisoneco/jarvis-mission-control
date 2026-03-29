@@ -1,5 +1,7 @@
 async function main() {
-  const res = await fetch('./status.json', { cache: 'no-store' });
+  const refreshBtn = document.getElementById('refreshBtn');
+  if (refreshBtn) refreshBtn.disabled = true;
+  const res = await fetch(`./status.json?t=${Date.now()}`, { cache: 'no-store' });
   const data = await res.json();
   const pnlEl = document.getElementById('pnlUsd');
   const pnlPctEl = document.getElementById('pnlPct');
@@ -28,7 +30,13 @@ async function main() {
 
   const notes = Array.isArray(data.recommendations) ? data.recommendations : [];
   document.getElementById('recommendations').innerHTML = notes.map((n) => `<li>${n}</li>`).join('');
+  if (refreshBtn) refreshBtn.disabled = false;
 }
+document.getElementById('refreshBtn')?.addEventListener('click', () => {
+  main().catch((err) => {
+    document.body.innerHTML = `<pre style="padding:20px;color:white">${String(err)}</pre>`;
+  });
+});
 main().catch((err) => {
   document.body.innerHTML = `<pre style="padding:20px;color:white">${String(err)}</pre>`;
 });
