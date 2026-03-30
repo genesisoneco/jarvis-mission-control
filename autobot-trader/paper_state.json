@@ -1,0 +1,31 @@
+{
+  "portfolio": {
+    "timestamp": "2026-03-30T11:04:00.000Z",
+    "solBalance": 1,
+    "usdcBalance": 0,
+    "solPriceUsd": 83.89324594520662,
+    "totalEquityUsd": 83.89324594520662,
+    "coreReserveUsd": 25.167973783561987,
+    "solCostBasisUsd": 83.89324594520662,
+    "realizedPnlUsd": 0,
+    "unrealizedPnlUsd": 0,
+    "netSolAccumulated": 1,
+    "regime": "RANGE"
+  },
+  "performance": {
+    "clusters": {},
+    "dailyEquity": {
+      "2026-03-30": {
+        "date": "2026-03-30",
+        "equityUsd": 83.89324594520662
+      }
+    },
+    "recommendations": {
+      "lastUpdated": "2026-03-30T11:04:00.000Z",
+      "notes": [
+        "New 1 SOL paper run initialized (moderate-aggressive DCA); previous paper fills cleared."
+      ]
+    }
+  },
+  "fills": []
+}
