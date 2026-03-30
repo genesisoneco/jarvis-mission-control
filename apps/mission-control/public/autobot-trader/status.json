@@ -1,15 +1,27 @@
 {
-  "updatedAt": "2026-03-30T20:04:00+09:00",
-  "equityUsd": 83.89324594520662,
+  "updatedAt": "2026-03-30T20:45:21+09:00",
+  "equityUsd": 100,
   "pnlUsd": 0,
   "pnlPct": 0,
-  "solBalance": 1,
-  "usdcBalance": 0,
-  "netSolAccumulated": 1,
-  "tradeCount": 0,
-  "latestTrade": null,
+  "solBalance": 0.011888859,
+  "usdcBalance": 99,
+  "netSolAccumulated": 0.011888859,
+  "tradeCount": 1,
+  "latestTrade": {
+    "fillId": "87944f70-bcf4-4187-8c53-e30505646a05",
+    "intentId": "5e20f854-d4c1-4547-8095-6b208f68566f",
+    "timestamp": "2026-03-30T11:45:20.721Z",
+    "baseSymbol": "SOL",
+    "quoteSymbol": "USDC",
+    "notionalUsdRequested": 1,
+    "notionalUsdExecuted": 1,
+    "sizeSolExecuted": 0.011888859,
+    "avgPriceUsd": 84.11236099275801,
+    "slippageBpsSimulated": 50,
+    "feesUsdSimulated": 0
+  },
   "recommendations": [
-    "New 1 SOL paper account initialized with moderate-aggressive DCA profile.",
-    "No trades executed yet in this run; wait for first DCA tick before evaluating behavior."
+    "Risk caps are constraining trades; current approved notional 1.0000 USD.",
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
   ]
 }
