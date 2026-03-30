@@ -1,24 +1,27 @@
 {
-  "updatedAt": "2026-03-30T14:07:05.722Z",
-  "equityUsd": 10000,
-  "pnlUsd": 9900,
-  "pnlPct": 9900,
-  "solBalance": 0.059354958,
-  "usdcBalance": 9995,
-  "netSolAccumulated": 0.059354958,
+  "updatedAt": "2026-03-30T14:07:13.383Z",
+  "equityUsd": 100,
+  "pnlUsd": 0,
+  "pnlPct": 0,
+  "solBalance": 0.059351907,
+  "usdcBalance": 95,
+  "netSolAccumulated": 0.059351907,
   "tradeCount": 1,
   "latestTrade": {
-    "fillId": "da5ff06d-9b0d-4872-80a4-c4f9e932fe60",
-    "intentId": "51fb63e9-82f7-4605-88f1-c98926988e0a",
-    "timestamp": "2026-03-30T14:07:05.720Z",
+    "fillId": "32eeddd8-9abf-4661-a74b-d48460fc72f0",
+    "intentId": "90092459-c522-4e21-be3e-b7c5ed096009",
+    "timestamp": "2026-03-30T14:07:12.732Z",
     "baseSymbol": "SOL",
     "quoteSymbol": "USDC",
     "notionalUsdRequested": 5,
     "notionalUsdExecuted": 5,
-    "sizeSolExecuted": 0.059354958,
-    "avgPriceUsd": 84.23896113278354,
+    "sizeSolExecuted": 0.059351907,
+    "avgPriceUsd": 84.24329145818348,
     "slippageBpsSimulated": 50,
     "feesUsdSimulated": 0
   },
-  "recommendations": []
+  "recommendations": [
+    "Research lab champion: Champion – Baseline ENV strategy",
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
+  ]
 }
