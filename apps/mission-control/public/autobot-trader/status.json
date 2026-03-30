@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-30T12:20:51.902Z",
+  "updatedAt": "2026-03-30T12:21:21.045Z",
   "equityUsd": 10000,
   "pnlUsd": 9900,
   "pnlPct": 9900,
@@ -22,6 +22,9 @@
   },
   "recommendations": [
     "Research lab champion: Champion – Baseline ENV strategy",
+    "Optimizer: sample 1d, equity 10000.00 -> 10000.00 (0.00%). Trades=1.",
+    "Optimizer: regime activity snapshot -> RANGE: trades=1, notional=5.00 USD.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters.",
     "Optimizer: sample 1d, equity 10000.00 -> 10000.00 (0.00%). Trades=1.",
     "Optimizer: regime activity snapshot -> RANGE: trades=1, notional=5.00 USD.",
     "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
