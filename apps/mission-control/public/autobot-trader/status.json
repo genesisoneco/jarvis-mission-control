@@ -1,28 +1,24 @@
 {
-  "updatedAt": "2026-03-30T13:06:07.383Z",
-  "equityUsd": 100.01369082353534,
-  "pnlUsd": 0.013691,
-  "pnlPct": 0.013691,
-  "solBalance": 0.248949523,
-  "usdcBalance": 79,
-  "netSolAccumulated": 0.248949523,
-  "tradeCount": 5,
+  "updatedAt": "2026-03-30T14:07:05.722Z",
+  "equityUsd": 10000,
+  "pnlUsd": 9900,
+  "pnlPct": 9900,
+  "solBalance": 0.059354958,
+  "usdcBalance": 9995,
+  "netSolAccumulated": 0.059354958,
+  "tradeCount": 1,
   "latestTrade": {
-    "fillId": "b92e0adf-0886-4fbb-8dc3-d21a4bd6bdb3",
-    "intentId": "12839161-0933-40a1-9a13-0af0114f6f3a",
-    "timestamp": "2026-03-30T13:05:28.136Z",
+    "fillId": "da5ff06d-9b0d-4872-80a4-c4f9e932fe60",
+    "intentId": "51fb63e9-82f7-4605-88f1-c98926988e0a",
+    "timestamp": "2026-03-30T14:07:05.720Z",
     "baseSymbol": "SOL",
     "quoteSymbol": "USDC",
     "notionalUsdRequested": 5,
     "notionalUsdExecuted": 5,
-    "sizeSolExecuted": 0.059235078,
-    "avgPriceUsd": 84.40944401221182,
+    "sizeSolExecuted": 0.059354958,
+    "avgPriceUsd": 84.23896113278354,
     "slippageBpsSimulated": 50,
     "feesUsdSimulated": 0
   },
-  "recommendations": [
-    "Optimizer: sample 1d, equity 100.01 -> 100.01 (0.00%). Trades=5.",
-    "Optimizer: regime activity snapshot -> RANGE: trades=5, notional=30.00 USD.",
-    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
-  ]
+  "recommendations": []
 }
