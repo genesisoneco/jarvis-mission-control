@@ -1,7 +1,27 @@
-async function main() {
+async function main(trigger = 'auto') {
   const refreshBtn = document.getElementById('refreshBtn');
-  if (refreshBtn) refreshBtn.disabled = true;
-  const res = await fetch(`./status.json?t=${Date.now()}`, { cache: 'no-store' });
+  const updatedAtBadge = document.getElementById('updatedAt');
+
+  if (refreshBtn) {
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = 'Refreshing…';
+  }
+  if (updatedAtBadge && trigger === 'manual') {
+    updatedAtBadge.textContent = 'Refreshing now…';
+  }
+
+  const res = await fetch(`./status.json?t=${Date.now()}`, {
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache, no-store, max-age=0',
+      Pragma: 'no-cache',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch status (${res.status})`);
+  }
+
   const data = await res.json();
   const pnlEl = document.getElementById('pnlUsd');
   const pnlPctEl = document.getElementById('pnlPct');
@@ -15,7 +35,12 @@ async function main() {
   document.getElementById('usdcBalance').textContent = Number(data.usdcBalance || 0).toFixed(2);
   document.getElementById('tradeCount').textContent = String(data.tradeCount || 0);
   document.getElementById('netSol').textContent = Number(data.netSolAccumulated || 0).toFixed(6);
-  document.getElementById('updatedAt').textContent = data.updatedAt ? `Updated ${new Date(data.updatedAt).toLocaleString()}` : 'Updated recently';
+
+  const fetchedAt = new Date();
+  if (updatedAtBadge) {
+    const statusTime = data.updatedAt ? new Date(data.updatedAt).toLocaleString() : 'recently';
+    updatedAtBadge.textContent = `Status ${statusTime} · Refreshed ${fetchedAt.toLocaleTimeString()}`;
+  }
 
   const trade = data.latestTrade || {};
   const tradeRoot = document.getElementById('latestTrade');
@@ -26,17 +51,23 @@ async function main() {
     ['Size', trade.sizeSolExecuted != null ? Number(trade.sizeSolExecuted).toFixed(6) : '—'],
     ['Avg price', trade.avgPriceUsd != null ? `$${Number(trade.avgPriceUsd).toFixed(4)}` : '—'],
   ];
-  tradeRoot.innerHTML = rows.map(([k,v]) => `<div class="kv"><span>${k}</span><b>${v}</b></div>`).join('');
+  tradeRoot.innerHTML = rows.map(([k, v]) => `<div class="kv"><span>${k}</span><b>${v}</b></div>`).join('');
 
   const notes = Array.isArray(data.recommendations) ? data.recommendations : [];
   document.getElementById('recommendations').innerHTML = notes.map((n) => `<li>${n}</li>`).join('');
-  if (refreshBtn) refreshBtn.disabled = false;
+
+  if (refreshBtn) {
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = 'Refresh';
+  }
 }
+
 document.getElementById('refreshBtn')?.addEventListener('click', () => {
-  main().catch((err) => {
+  main('manual').catch((err) => {
     document.body.innerHTML = `<pre style="padding:20px;color:white">${String(err)}</pre>`;
   });
 });
+
 main().catch((err) => {
   document.body.innerHTML = `<pre style="padding:20px;color:white">${String(err)}</pre>`;
 });
