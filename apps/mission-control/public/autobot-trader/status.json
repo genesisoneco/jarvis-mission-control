@@ -1,29 +1,15 @@
-﻿{
-    "updatedAt":  "2026-03-29T20:21:07.2071639+09:00",
-    "equityUsd":  70,
-    "pnlUsd":  0,
-    "pnlPct":  0,
-    "solBalance":  0.00847967,
-    "usdcBalance":  69.3,
-    "netSolAccumulated":  0.00847967,
-    "tradeCount":  1,
-    "latestTrade":  {
-                        "fillId":  "72836b10-53f6-46f9-a6fd-818d9730e762",
-                        "intentId":  "6e7e85a2-0f58-41ce-bae3-6c7f4f5b3ea6",
-                        "timestamp":  "2026-03-29T11:20:37.434Z",
-                        "baseSymbol":  "SOL",
-                        "quoteSymbol":  "USDC",
-                        "notionalUsdRequested":  0.7000000000000001,
-                        "notionalUsdExecuted":  0.7000000000000001,
-                        "sizeSolExecuted":  0.00847967,
-                        "avgPriceUsd":  82.55038226723447,
-                        "slippageBpsSimulated":  50,
-                        "feesUsdSimulated":  0
-                    },
-    "recommendations":  [
-                            "Sample size is tiny; do not change live strategy based on current data.",
-                            "No realized paper edge yet; continue gathering data before changing core logic.",
-                            "Small-bankroll simulation is heavily constrained by percent caps; consider a parallel larger paper account for strategy validation.",
-                            "Cluster DCA_BUY/RANGE: trades=1, totalNotionalUsd=10"
-                        ]
+{
+  "updatedAt": "2026-03-30T20:04:00+09:00",
+  "equityUsd": 83.89324594520662,
+  "pnlUsd": 0,
+  "pnlPct": 0,
+  "solBalance": 1,
+  "usdcBalance": 0,
+  "netSolAccumulated": 1,
+  "tradeCount": 0,
+  "latestTrade": null,
+  "recommendations": [
+    "New 1 SOL paper account initialized with moderate-aggressive DCA profile.",
+    "No trades executed yet in this run; wait for first DCA tick before evaluating behavior."
+  ]
 }
