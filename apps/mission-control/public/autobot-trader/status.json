@@ -1,27 +1,29 @@
 {
-  "updatedAt": "2026-03-30T20:45:21+09:00",
-  "equityUsd": 100,
-  "pnlUsd": 0,
-  "pnlPct": 0,
-  "solBalance": 0.011888859,
-  "usdcBalance": 99,
-  "netSolAccumulated": 0.011888859,
+  "updatedAt": "2026-03-30T12:20:51.902Z",
+  "equityUsd": 10000,
+  "pnlUsd": 9900,
+  "pnlPct": 9900,
+  "solBalance": 0.05933993,
+  "usdcBalance": 9995,
+  "netSolAccumulated": 0.05933993,
   "tradeCount": 1,
   "latestTrade": {
-    "fillId": "87944f70-bcf4-4187-8c53-e30505646a05",
-    "intentId": "5e20f854-d4c1-4547-8095-6b208f68566f",
-    "timestamp": "2026-03-30T11:45:20.721Z",
+    "fillId": "aa0f229d-88d3-46e2-8efe-949f63ea4653",
+    "intentId": "a8849de5-50c9-4a20-8a72-353b0f79cd17",
+    "timestamp": "2026-03-30T12:12:55.389Z",
     "baseSymbol": "SOL",
     "quoteSymbol": "USDC",
-    "notionalUsdRequested": 1,
-    "notionalUsdExecuted": 1,
-    "sizeSolExecuted": 0.011888859,
-    "avgPriceUsd": 84.11236099275801,
+    "notionalUsdRequested": 5,
+    "notionalUsdExecuted": 5,
+    "sizeSolExecuted": 0.05933993,
+    "avgPriceUsd": 84.26029488069838,
     "slippageBpsSimulated": 50,
     "feesUsdSimulated": 0
   },
   "recommendations": [
-    "Risk caps are constraining trades; current approved notional 1.0000 USD.",
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
+    "Research lab champion: Champion – Baseline ENV strategy",
+    "Optimizer: sample 1d, equity 10000.00 -> 10000.00 (0.00%). Trades=1.",
+    "Optimizer: regime activity snapshot -> RANGE: trades=1, notional=5.00 USD.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
   ]
 }
