@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-30T12:28:12.049Z",
+  "updatedAt": "2026-03-30T12:28:29.192Z",
   "equityUsd": 100,
   "pnlUsd": 0,
   "pnlPct": 0,
@@ -22,6 +22,9 @@
   },
   "recommendations": [
     "Research lab champion: Champion – Baseline ENV strategy",
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
+    "Optimizer: sample 1d, equity 100.00 -> 100.00 (0.00%). Trades=1.",
+    "Optimizer: regime activity snapshot -> RANGE: trades=1, notional=5.00 USD.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
   ]
 }
