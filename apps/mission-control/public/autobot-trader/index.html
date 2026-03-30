@@ -6,39 +6,89 @@
   <title>Richard's Autobot Trader</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <div class="shell">
-    <header class="hero">
-      <div>
-        <div class="eyebrow">SOL PAPER TRADING</div>
-        <h1>Richard's Autobot Trader</h1>
-        <p class="sub">Static GitHub status page synced from the latest local paper simulation snapshot.</p>
+    <div class="bg-grid"></div>
+
+    <header class="hero card">
+      <div class="hero-copy">
+        <div class="eyebrow">SOL PAPER TRADING · MISSION HUD</div>
+        <h1 class="hero-title">Richard's Autobot Trader</h1>
+        <p class="sub">A lightweight futuristic status panel for the active Autobot paper strategy and research-lab champion state.</p>
+        <div class="hero-meta">
+          <span class="pill pill-cyan" id="strategyBadge">Moderate-Aggressive</span>
+          <span class="pill pill-emerald" id="statusPulse">SYNCED</span>
+          <span class="pill" id="updatedAt">Updating…</span>
+        </div>
       </div>
       <div class="hero-actions">
         <button class="refresh-btn" id="refreshBtn" type="button">Refresh</button>
-        <div class="badge" id="updatedAt">Updating…</div>
       </div>
     </header>
 
     <section class="grid stats">
-      <article class="card stat"><span>Equity</span><strong id="equityUsd">—</strong></article>
+      <article class="card stat stat-highlight"><span>Equity</span><strong id="equityUsd">—</strong><small>Total paper account value</small></article>
       <article class="card stat"><span>P/L</span><strong id="pnlUsd">—</strong><small id="pnlPct">—</small></article>
-      <article class="card stat"><span>SOL</span><strong id="solBalance">—</strong></article>
-      <article class="card stat"><span>USDC</span><strong id="usdcBalance">—</strong></article>
-      <article class="card stat"><span>Trades</span><strong id="tradeCount">—</strong></article>
-      <article class="card stat"><span>Net SOL</span><strong id="netSol">—</strong></article>
+      <article class="card stat"><span>SOL</span><strong id="solBalance">—</strong><small>Accumulated position</small></article>
+      <article class="card stat"><span>USDC</span><strong id="usdcBalance">—</strong><small>Remaining dry powder</small></article>
+      <article class="card stat"><span>Trades</span><strong id="tradeCount">—</strong><small>Executed fills</small></article>
+      <article class="card stat"><span>Net SOL</span><strong id="netSol">—</strong><small>Total SOL gained</small></article>
+    </section>
+
+    <section class="grid visual-grid">
+      <article class="card chart-card">
+        <div class="panel-head">
+          <h2>Capital Allocation</h2>
+          <span class="panel-tag">LIVE SNAPSHOT</span>
+        </div>
+        <div class="allocation-wrap">
+          <div class="allocation-bar">
+            <div id="allocationSol" class="allocation-sol"></div>
+            <div id="allocationUsdc" class="allocation-usdc"></div>
+          </div>
+          <div class="allocation-legend">
+            <span><i class="legend-dot sol"></i> SOL Exposure</span>
+            <span><i class="legend-dot usdc"></i> USDC Reserve</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="card chart-card">
+        <div class="panel-head">
+          <h2>Momentum Trace</h2>
+          <span class="panel-tag">HUD GRAPH</span>
+        </div>
+        <div class="sparkline-wrap">
+          <svg id="sparkline" viewBox="0 0 320 120" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="sparkFill" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="rgba(34,211,238,0.45)" />
+                <stop offset="100%" stop-color="rgba(34,211,238,0.02)" />
+              </linearGradient>
+            </defs>
+            <path id="sparkArea" d="" fill="url(#sparkFill)"></path>
+            <path id="sparkPath" d="" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"></path>
+          </svg>
+        </div>
+      </article>
     </section>
 
     <section class="grid two-up">
       <article class="card">
-        <h2>Latest trade</h2>
+        <div class="panel-head">
+          <h2>Latest Trade</h2>
+          <span class="panel-tag">EXECUTION</span>
+        </div>
         <div id="latestTrade" class="kv-list"></div>
       </article>
       <article class="card">
-        <h2>Recommendations</h2>
+        <div class="panel-head">
+          <h2>System Notes</h2>
+          <span class="panel-tag">GUIDANCE</span>
+        </div>
         <ul id="recommendations" class="notes"></ul>
       </article>
     </section>
