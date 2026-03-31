@@ -1,16 +1,16 @@
 {
-  "updatedAt": null,
-  "equityUsd": 100,
-  "pnlUsd": 0,
-  "pnlPct": 0,
-  "solBalance": 0,
-  "usdcBalance": 100,
-  "netSolAccumulated": 0,
+  "updatedAt": "2026-03-31T14:28:39.820Z",
+  "equityUsd": 83.89324594520662,
+  "pnlUsd": -16.106754,
+  "pnlPct": -16.106754,
+  "solBalance": 1,
+  "usdcBalance": 0,
+  "netSolAccumulated": 1,
   "tradeCount": 0,
   "latestTrade": null,
   "recommendations": [
-    "Fresh $100 SOL paper account.",
-    "Strategy: self-learning buy-low/sell-high SOL accumulation.",
-    "No trades yet in this regime; 1 SOL preload history cleared."
+    "New 1 SOL paper run initialized (moderate-aggressive DCA); previous paper fills cleared.",
+    "Optimizer: sample 1d, equity 83.89 -> 83.89 (0.00%). Trades=0.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
   ]
 }
