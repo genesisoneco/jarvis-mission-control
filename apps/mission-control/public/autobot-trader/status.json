@@ -1,26 +1,30 @@
-﻿{
-    "updatedAt":  "2026-04-01T02:28:39.5709608+09:00",
-    "equityUsd":  99.9206,
-    "pnlUsd":  -0.0794,
-    "pnlPct":  -0.0794,
-    "solBalance":  0.307733617,
-    "usdcBalance":  75.002436386867345,
-    "netSolAccumulated":  0.307733617,
-    "tradeCount":  6,
-    "latestTrade":  {
-                        "fillId":  "2c406bc2-efb8-4708-b394-2b970c14d6b6",
-                        "intentId":  "6df01c0f-2151-4193-8458-2d191d5c9807",
-                        "timestamp":  "2026-03-31T16:12:42.537Z",
-                        "baseSymbol":  "SOL",
-                        "quoteSymbol":  "USDC",
-                        "notionalUsdRequested":  0.009350133043813713,
-                        "notionalUsdExecuted":  0.009350133043813713,
-                        "sizeSolExecuted":  0.000115472,
-                        "avgPriceUsd":  80.97316270449731,
-                        "slippageBpsSimulated":  50,
-                        "feesUsdSimulated":  0
-                    },
-    "recommendations":  [
-
-                        ]
+{
+  "updatedAt": "2026-03-31T17:43:41.805Z",
+  "equityUsd": 99.9206006258518,
+  "pnlUsd": -0.079399,
+  "pnlPct": -0.079399,
+  "solBalance": 0.307733617,
+  "usdcBalance": 75.00243638686734,
+  "netSolAccumulated": 0.307733617,
+  "tradeCount": 6,
+  "latestTrade": {
+    "fillId": "2c406bc2-efb8-4708-b394-2b970c14d6b6",
+    "intentId": "6df01c0f-2151-4193-8458-2d191d5c9807",
+    "timestamp": "2026-03-31T16:12:42.537Z",
+    "baseSymbol": "SOL",
+    "quoteSymbol": "USDC",
+    "notionalUsdRequested": 0.009350133043813713,
+    "notionalUsdExecuted": 0.009350133043813713,
+    "sizeSolExecuted": 0.000115472,
+    "avgPriceUsd": 80.97316270449731,
+    "slippageBpsSimulated": 50,
+    "feesUsdSimulated": 0
+  },
+  "recommendations": [
+    "Risk caps are constraining trades; current approved notional 0.0094 USD.",
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
+    "Optimizer: sample 1d, equity 99.92 -> 99.92 (0.00%). Trades=6.",
+    "Optimizer: regime activity snapshot -> RANGE: trades=6, notional=30.00 USD.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
+  ]
 }
