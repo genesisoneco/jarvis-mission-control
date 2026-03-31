@@ -1,29 +1,26 @@
-{
-  "updatedAt": "2026-03-31T15:43:41.060Z",
-  "equityUsd": 99.95285392035537,
-  "pnlUsd": -0.047146,
-  "pnlPct": -0.047146,
-  "solBalance": 0.24618663600000001,
-  "usdcBalance": 80,
-  "netSolAccumulated": 0.24618663600000001,
-  "tradeCount": 4,
-  "latestTrade": {
-    "fillId": "abedab37-aad8-4e6f-aab2-bb6d133d3fef",
-    "intentId": "0936cf33-7a9b-445f-ad5d-c2512f41522d",
-    "timestamp": "2026-03-31T15:32:39.647Z",
-    "baseSymbol": "SOL",
-    "quoteSymbol": "USDC",
-    "notionalUsdRequested": 5,
-    "notionalUsdExecuted": 5,
-    "sizeSolExecuted": 0.061692086,
-    "avgPriceUsd": 81.04767279226058,
-    "slippageBpsSimulated": 50,
-    "feesUsdSimulated": 0
-  },
-  "recommendations": [
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
-    "Optimizer: sample 1d, equity 99.95 -> 99.95 (0.00%). Trades=4.",
-    "Optimizer: regime activity snapshot -> RANGE: trades=4, notional=20.00 USD.",
-    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
-  ]
+﻿{
+    "updatedAt":  "2026-04-01T01:28:31.4697934+09:00",
+    "equityUsd":  99.9206,
+    "pnlUsd":  -0.0794,
+    "pnlPct":  -0.0794,
+    "solBalance":  0.307733617,
+    "usdcBalance":  75.002436386867345,
+    "netSolAccumulated":  0.307733617,
+    "tradeCount":  6,
+    "latestTrade":  {
+                        "fillId":  "2c406bc2-efb8-4708-b394-2b970c14d6b6",
+                        "intentId":  "6df01c0f-2151-4193-8458-2d191d5c9807",
+                        "timestamp":  "2026-03-31T16:12:42.537Z",
+                        "baseSymbol":  "SOL",
+                        "quoteSymbol":  "USDC",
+                        "notionalUsdRequested":  0.009350133043813713,
+                        "notionalUsdExecuted":  0.009350133043813713,
+                        "sizeSolExecuted":  0.000115472,
+                        "avgPriceUsd":  80.97316270449731,
+                        "slippageBpsSimulated":  50,
+                        "feesUsdSimulated":  0
+                    },
+    "recommendations":  [
+
+                        ]
 }
