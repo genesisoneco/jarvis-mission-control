@@ -1,16 +1,29 @@
 {
-  "updatedAt": "2026-03-31T14:28:39.820Z",
-  "equityUsd": 83.89324594520662,
-  "pnlUsd": -16.106754,
-  "pnlPct": -16.106754,
-  "solBalance": 1,
-  "usdcBalance": 0,
-  "netSolAccumulated": 1,
-  "tradeCount": 0,
-  "latestTrade": null,
+  "updatedAt": "2026-03-31T14:43:34.728Z",
+  "equityUsd": 100,
+  "pnlUsd": 0,
+  "pnlPct": 0,
+  "solBalance": 0.061031646,
+  "usdcBalance": 95,
+  "netSolAccumulated": 0.061031646,
+  "tradeCount": 1,
+  "latestTrade": {
+    "fillId": "b753e159-caf5-4408-ba5d-adfe4d7061e1",
+    "intentId": "5ff68b57-924e-473f-bcc5-a2915be1980f",
+    "timestamp": "2026-03-31T14:32:29.037Z",
+    "baseSymbol": "SOL",
+    "quoteSymbol": "USDC",
+    "notionalUsdRequested": 5,
+    "notionalUsdExecuted": 5,
+    "sizeSolExecuted": 0.061031646,
+    "avgPriceUsd": 81.92471164877315,
+    "slippageBpsSimulated": 50,
+    "feesUsdSimulated": 0
+  },
   "recommendations": [
-    "New 1 SOL paper run initialized (moderate-aggressive DCA); previous paper fills cleared.",
-    "Optimizer: sample 1d, equity 83.89 -> 83.89 (0.00%). Trades=0.",
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
+    "Optimizer: sample 1d, equity 100.00 -> 100.00 (0.00%). Trades=1.",
+    "Optimizer: regime activity snapshot -> RANGE: trades=1, notional=5.00 USD.",
     "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
   ]
 }
