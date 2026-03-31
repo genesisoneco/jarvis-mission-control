@@ -1,29 +1,26 @@
-{
-  "updatedAt": "2026-03-31T14:43:34.728Z",
-  "equityUsd": 100,
-  "pnlUsd": 0,
-  "pnlPct": 0,
-  "solBalance": 0.061031646,
-  "usdcBalance": 95,
-  "netSolAccumulated": 0.061031646,
-  "tradeCount": 1,
-  "latestTrade": {
-    "fillId": "b753e159-caf5-4408-ba5d-adfe4d7061e1",
-    "intentId": "5ff68b57-924e-473f-bcc5-a2915be1980f",
-    "timestamp": "2026-03-31T14:32:29.037Z",
-    "baseSymbol": "SOL",
-    "quoteSymbol": "USDC",
-    "notionalUsdRequested": 5,
-    "notionalUsdExecuted": 5,
-    "sizeSolExecuted": 0.061031646,
-    "avgPriceUsd": 81.92471164877315,
-    "slippageBpsSimulated": 50,
-    "feesUsdSimulated": 0
-  },
-  "recommendations": [
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
-    "Optimizer: sample 1d, equity 100.00 -> 100.00 (0.00%). Trades=1.",
-    "Optimizer: regime activity snapshot -> RANGE: trades=1, notional=5.00 USD.",
-    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
-  ]
+﻿{
+    "updatedAt":  "2026-03-31T23:58:38.6264170+09:00",
+    "equityUsd":  99.9206,
+    "pnlUsd":  -0.0794,
+    "pnlPct":  -0.0794,
+    "solBalance":  0.12304802,
+    "usdcBalance":  90,
+    "netSolAccumulated":  0.12304802,
+    "tradeCount":  2,
+    "latestTrade":  {
+                        "fillId":  "5d485a69-cf82-44b5-a58b-12575f0f4cab",
+                        "intentId":  "38a8b688-49e2-4b08-a13a-36add49485fc",
+                        "timestamp":  "2026-03-31T14:52:32.661Z",
+                        "baseSymbol":  "SOL",
+                        "quoteSymbol":  "USDC",
+                        "notionalUsdRequested":  5,
+                        "notionalUsdExecuted":  5,
+                        "sizeSolExecuted":  0.062016374,
+                        "avgPriceUsd":  80.62386878665302,
+                        "slippageBpsSimulated":  50,
+                        "feesUsdSimulated":  0
+                    },
+    "recommendations":  [
+
+                        ]
 }
