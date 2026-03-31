@@ -1,26 +1,28 @@
-﻿{
-    "updatedAt":  "2026-03-31T23:58:38.6264170+09:00",
-    "equityUsd":  99.9206,
-    "pnlUsd":  -0.0794,
-    "pnlPct":  -0.0794,
-    "solBalance":  0.12304802,
-    "usdcBalance":  90,
-    "netSolAccumulated":  0.12304802,
-    "tradeCount":  2,
-    "latestTrade":  {
-                        "fillId":  "5d485a69-cf82-44b5-a58b-12575f0f4cab",
-                        "intentId":  "38a8b688-49e2-4b08-a13a-36add49485fc",
-                        "timestamp":  "2026-03-31T14:52:32.661Z",
-                        "baseSymbol":  "SOL",
-                        "quoteSymbol":  "USDC",
-                        "notionalUsdRequested":  5,
-                        "notionalUsdExecuted":  5,
-                        "sizeSolExecuted":  0.062016374,
-                        "avgPriceUsd":  80.62386878665302,
-                        "slippageBpsSimulated":  50,
-                        "feesUsdSimulated":  0
-                    },
-    "recommendations":  [
-
-                        ]
+{
+  "updatedAt": "2026-03-31T15:13:40.617Z",
+  "equityUsd": 100.01260933693082,
+  "pnlUsd": 0.012609,
+  "pnlPct": 0.012609,
+  "solBalance": 0.18449455,
+  "usdcBalance": 85,
+  "netSolAccumulated": 0.18449455,
+  "tradeCount": 3,
+  "latestTrade": {
+    "fillId": "33a46ca5-22e4-4c2c-9d4c-0cbb14baaa5a",
+    "intentId": "3c704a60-2dcd-4218-b9e6-016507cf4401",
+    "timestamp": "2026-03-31T15:12:36.103Z",
+    "baseSymbol": "SOL",
+    "quoteSymbol": "USDC",
+    "notionalUsdRequested": 5,
+    "notionalUsdExecuted": 5,
+    "sizeSolExecuted": 0.06144653,
+    "avgPriceUsd": 81.37155995627418,
+    "slippageBpsSimulated": 50,
+    "feesUsdSimulated": 0
+  },
+  "recommendations": [
+    "Optimizer: sample 1d, equity 100.01 -> 100.01 (0.00%). Trades=3.",
+    "Optimizer: regime activity snapshot -> RANGE: trades=3, notional=15.00 USD.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
+  ]
 }
