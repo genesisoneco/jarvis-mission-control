@@ -1,27 +1,16 @@
 {
-  "updatedAt": "2026-03-30T14:31:24.059Z",
-  "equityUsd": 99.9753154667984,
-  "pnlUsd": -0.024685,
-  "pnlPct": -0.024685,
-  "solBalance": 0.118593529,
-  "usdcBalance": 90,
-  "netSolAccumulated": 0.118593529,
-  "tradeCount": 2,
-  "latestTrade": {
-    "fillId": "f238b541-d7a3-4caf-bfc3-6470caee525a",
-    "intentId": "e5886603-d315-4385-94c7-d64f4d73a89a",
-    "timestamp": "2026-03-30T14:31:19.435Z",
-    "baseSymbol": "SOL",
-    "quoteSymbol": "USDC",
-    "notionalUsdRequested": 5,
-    "notionalUsdExecuted": 5,
-    "sizeSolExecuted": 0.059443498,
-    "avgPriceUsd": 84.11348874522828,
-    "slippageBpsSimulated": 50,
-    "feesUsdSimulated": 0
-  },
+  "updatedAt": "2026-03-31T14:15:11.635Z",
+  "equityUsd": 83.89324594520662,
+  "pnlUsd": -16.106754,
+  "pnlPct": -16.106754,
+  "solBalance": 1,
+  "usdcBalance": 0,
+  "netSolAccumulated": 1,
+  "tradeCount": 0,
+  "latestTrade": null,
   "recommendations": [
-    "Research lab champion: Champion – Baseline ENV strategy",
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
+    "New 1 SOL paper run initialized (moderate-aggressive DCA); previous paper fills cleared.",
+    "Optimizer: sample 1d, equity 83.89 -> 83.89 (0.00%). Trades=0.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
   ]
 }
