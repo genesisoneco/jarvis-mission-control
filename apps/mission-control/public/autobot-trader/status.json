@@ -1,29 +1,26 @@
 {
-  "updatedAt": "2026-04-01T23:22:50.985Z",
-  "equityUsd": 99.89114482665481,
-  "pnlUsd": -0.108855,
-  "pnlPct": -0.108855,
-  "solBalance": 0.14621095,
-  "usdcBalance": 88,
-  "netSolAccumulated": 0.14621095,
-  "tradeCount": 2,
+  "updatedAt": "2026-04-01T23:42:54.620Z",
+  "equityUsd": 99.89779591528129,
+  "pnlUsd": -0.102204,
+  "pnlPct": -0.102204,
+  "solBalance": 0.23223332400000002,
+  "usdcBalance": 81,
+  "netSolAccumulated": 0.23223332400000002,
+  "tradeCount": 3,
   "latestTrade": {
-    "fillId": "4091821d-9ee4-46ff-85ae-999e4e7a7976",
-    "intentId": "f2f6b988-6f10-4ab3-b31d-2a0cb826f3cc",
-    "timestamp": "2026-04-01T23:16:59.942Z",
+    "fillId": "c1f7495c-966a-43bb-8e8e-7c466860bfb6",
+    "intentId": "55bac985-49b5-4c0f-897d-153e0fc3106f",
+    "timestamp": "2026-04-01T23:42:54.615Z",
     "baseSymbol": "SOL",
     "quoteSymbol": "USDC",
     "notionalUsdRequested": 7,
     "notionalUsdExecuted": 7,
-    "sizeSolExecuted": 0.086070489,
-    "avgPriceUsd": 81.32868862868898,
+    "sizeSolExecuted": 0.086022374,
+    "avgPriceUsd": 81.37417830389103,
     "slippageBpsSimulated": 50,
     "feesUsdSimulated": 0
   },
   "recommendations": [
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
-    "Optimizer: sample 1d, equity 99.89 -> 99.89 (0.00%). Trades=2.",
-    "Optimizer: regime activity snapshot -> RANGE: trades=2, notional=12.00 USD.",
-    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
   ]
 }
