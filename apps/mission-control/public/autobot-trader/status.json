@@ -1,16 +1,14 @@
-{
-  "updatedAt": "2026-04-01T12:17:36.322Z",
-  "equityUsd": 83.89324594520662,
-  "pnlUsd": -16.106754,
-  "pnlPct": -16.106754,
-  "solBalance": 1,
-  "usdcBalance": 0,
-  "netSolAccumulated": 1,
-  "tradeCount": 0,
-  "latestTrade": null,
-  "recommendations": [
-    "New 1 SOL paper run initialized (moderate-aggressive DCA); previous paper fills cleared.",
-    "Optimizer: sample 1d, equity 83.89 -> 83.89 (0.00%). Trades=0.",
-    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
-  ]
+﻿{
+    "updatedAt":  "2026-04-01T21:46:27.3908615+09:00",
+    "equityUsd":  83.8932,
+    "pnlUsd":  -16.1068,
+    "pnlPct":  -16.1068,
+    "solBalance":  1,
+    "usdcBalance":  0,
+    "netSolAccumulated":  1,
+    "tradeCount":  0,
+    "latestTrade":  null,
+    "recommendations":  [
+
+                        ]
 }
