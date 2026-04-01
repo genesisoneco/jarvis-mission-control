@@ -1,26 +1,26 @@
-﻿{
-    "updatedAt":  "2026-04-02T00:47:14.3261649+09:00",
-    "equityUsd":  100,
-    "pnlUsd":  0,
-    "pnlPct":  0,
-    "solBalance":  0.060140461,
-    "usdcBalance":  95,
-    "netSolAccumulated":  0.060140461,
-    "tradeCount":  1,
-    "latestTrade":  {
-                        "fillId":  "7ac117af-c61f-44fb-b156-c6fcea4b4f96",
-                        "intentId":  "cc8feb3f-fe14-466a-ac8c-f9fccf461e6b",
-                        "timestamp":  "2026-04-01T14:22:53.903Z",
-                        "baseSymbol":  "SOL",
-                        "quoteSymbol":  "USDC",
-                        "notionalUsdRequested":  5,
-                        "notionalUsdExecuted":  5,
-                        "sizeSolExecuted":  0.060140461,
-                        "avgPriceUsd":  83.13870424105994,
-                        "slippageBpsSimulated":  50,
-                        "feesUsdSimulated":  0
-                    },
-    "recommendations":  [
-
-                        ]
+{
+  "updatedAt": "2026-04-01T23:16:59.945Z",
+  "equityUsd": 99.89114482665481,
+  "pnlUsd": -0.108855,
+  "pnlPct": -0.108855,
+  "solBalance": 0.14621095,
+  "usdcBalance": 88,
+  "netSolAccumulated": 0.14621095,
+  "tradeCount": 2,
+  "latestTrade": {
+    "fillId": "4091821d-9ee4-46ff-85ae-999e4e7a7976",
+    "intentId": "f2f6b988-6f10-4ab3-b31d-2a0cb826f3cc",
+    "timestamp": "2026-04-01T23:16:59.942Z",
+    "baseSymbol": "SOL",
+    "quoteSymbol": "USDC",
+    "notionalUsdRequested": 7,
+    "notionalUsdExecuted": 7,
+    "sizeSolExecuted": 0.086070489,
+    "avgPriceUsd": 81.32868862868898,
+    "slippageBpsSimulated": 50,
+    "feesUsdSimulated": 0
+  },
+  "recommendations": [
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
+  ]
 }
