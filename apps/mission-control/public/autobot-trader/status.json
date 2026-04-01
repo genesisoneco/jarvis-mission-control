@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-01T23:16:59.945Z",
+  "updatedAt": "2026-04-01T23:17:23.858Z",
   "equityUsd": 99.89114482665481,
   "pnlUsd": -0.108855,
   "pnlPct": -0.108855,
@@ -21,6 +21,9 @@
     "feesUsdSimulated": 0
   },
   "recommendations": [
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
+    "Optimizer: sample 1d, equity 99.89 -> 99.89 (0.00%). Trades=2.",
+    "Optimizer: regime activity snapshot -> RANGE: trades=2, notional=12.00 USD.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
   ]
 }
