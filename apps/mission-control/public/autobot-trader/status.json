@@ -1,30 +1,27 @@
 {
-  "updatedAt": "2026-04-02T23:39:22.463Z",
-  "equityUsd": 99.01561298223211,
-  "pnlUsd": -0.984387,
-  "pnlPct": -0.984387,
-  "solBalance": 0.516589951,
-  "usdcBalance": 58.21387561637893,
-  "netSolAccumulated": 0.516589951,
-  "tradeCount": 7,
+  "updatedAt": "2026-04-02T23:46:58.726Z",
+  "equityUsd": 98.96749371581626,
+  "pnlUsd": -1.032506,
+  "pnlPct": -1.032506,
+  "solBalance": 0.604289117,
+  "usdcBalance": 51.29531610533037,
+  "netSolAccumulated": 0.604289117,
+  "tradeCount": 8,
   "latestTrade": {
-    "fillId": "0d167603-39d7-4f26-b65f-86ebcea154f1",
-    "intentId": "dedd3b3b-85f0-4cde-b26f-f72373312050",
-    "timestamp": "2026-04-02T23:26:55.690Z",
+    "fillId": "d9716f08-b70e-42a6-9b86-e91c0557a35d",
+    "intentId": "e29efe9f-06b4-4adb-bed7-b69767aa9fbb",
+    "timestamp": "2026-04-02T23:46:58.724Z",
     "baseSymbol": "SOL",
     "quoteSymbol": "USDC",
-    "notionalUsdRequested": 6.83666122097792,
-    "notionalUsdExecuted": 6.83666122097792,
-    "sizeSolExecuted": 0.086558826,
-    "avgPriceUsd": 78.98283210285129,
+    "notionalUsdRequested": 6.91855951104856,
+    "notionalUsdExecuted": 6.91855951104856,
+    "sizeSolExecuted": 0.087699166,
+    "avgPriceUsd": 78.88968420804093,
     "slippageBpsSimulated": 50,
     "feesUsdSimulated": 0
   },
   "recommendations": [
-    "Risk caps are constraining trades; current approved notional 6.8367 USD.",
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
-    "Optimizer: sample 2d, equity 99.90 -> 99.02 (-0.88%). Trades=7.",
-    "Optimizer: regime activity snapshot -> RANGE: trades=6, notional=40.00 USD; BULL: trades=1, notional=7.00 USD.",
-    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
+    "Risk caps are constraining trades; current approved notional 6.9186 USD.",
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
   ]
 }
