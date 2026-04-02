@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-02T22:46:49.214Z",
+  "updatedAt": "2026-04-02T22:54:23.396Z",
   "equityUsd": 99.2870812787369,
   "pnlUsd": -0.712919,
   "pnlPct": -0.712919,
@@ -22,6 +22,9 @@
   },
   "recommendations": [
     "Risk caps are constraining trades; current approved notional 4.9980 USD.",
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
+    "Optimizer: sample 2d, equity 99.90 -> 99.29 (-0.61%). Trades=6.",
+    "Optimizer: regime activity snapshot -> RANGE: trades=6, notional=40.00 USD.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
   ]
 }
