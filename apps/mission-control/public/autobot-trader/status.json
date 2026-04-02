@@ -1,30 +1,27 @@
 {
-  "updatedAt": "2026-04-02T15:05:37.491Z",
-  "equityUsd": 99.83154387547718,
-  "pnlUsd": -0.168456,
-  "pnlPct": -0.168456,
-  "solBalance": 0.367253182,
-  "usdcBalance": 70.04854677316771,
-  "netSolAccumulated": 0.367253182,
-  "tradeCount": 5,
+  "updatedAt": "2026-04-02T15:09:21.866Z",
+  "equityUsd": 99.06220099082219,
+  "pnlUsd": -0.937799,
+  "pnlPct": -0.937799,
+  "solBalance": 0.430517707,
+  "usdcBalance": 65.05053683735684,
+  "netSolAccumulated": 0.430517707,
+  "tradeCount": 6,
   "latestTrade": {
-    "fillId": "340fefb8-14e3-49ba-b6fa-1409a5babbba",
-    "intentId": "f3337843-70d2-45c0-91c0-aa3a5ae35f55",
-    "timestamp": "2026-04-02T00:23:10.925Z",
+    "fillId": "a62b1a79-6297-407f-995a-db3a2402b2fc",
+    "intentId": "48e89d4c-e510-42fb-abc0-14b7221b48aa",
+    "timestamp": "2026-04-02T15:09:21.863Z",
     "baseSymbol": "SOL",
     "quoteSymbol": "USDC",
-    "notionalUsdRequested": 3.9514532268322853,
-    "notionalUsdExecuted": 3.9514532268322853,
-    "sizeSolExecuted": 0.048725243,
-    "avgPriceUsd": 81.09663458902165,
+    "notionalUsdRequested": 4.998009935810867,
+    "notionalUsdExecuted": 4.998009935810867,
+    "sizeSolExecuted": 0.063264525,
+    "avgPriceUsd": 79.00177762831329,
     "slippageBpsSimulated": 50,
     "feesUsdSimulated": 0
   },
   "recommendations": [
-    "Risk caps are constraining trades; current approved notional 3.9515 USD.",
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
-    "Optimizer: sample 2d, equity 99.90 -> 99.83 (-0.07%). Trades=5.",
-    "Optimizer: regime activity snapshot -> RANGE: trades=5, notional=33.00 USD.",
-    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
+    "Risk caps are constraining trades; current approved notional 4.9980 USD.",
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
   ]
 }
