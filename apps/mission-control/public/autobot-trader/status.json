@@ -1,27 +1,30 @@
 {
-  "updatedAt": "2026-04-02T14:24:21.490Z",
-  "equityUsd": 98.82069369416092,
-  "pnlUsd": -1.179306,
-  "pnlPct": -1.179306,
-  "solBalance": 0.43104873600000004,
-  "usdcBalance": 65.05053683735684,
-  "netSolAccumulated": 0.43104873600000004,
-  "tradeCount": 6,
+  "updatedAt": "2026-04-02T14:25:30.697Z",
+  "equityUsd": 99.83154387547718,
+  "pnlUsd": -0.168456,
+  "pnlPct": -0.168456,
+  "solBalance": 0.367253182,
+  "usdcBalance": 70.04854677316771,
+  "netSolAccumulated": 0.367253182,
+  "tradeCount": 5,
   "latestTrade": {
-    "fillId": "e74e8760-53d2-4c0f-87bb-37b33ce5f631",
-    "intentId": "e4e2c001-947b-48e3-ac32-877cbb76f640",
-    "timestamp": "2026-04-02T14:24:21.488Z",
+    "fillId": "340fefb8-14e3-49ba-b6fa-1409a5babbba",
+    "intentId": "f3337843-70d2-45c0-91c0-aa3a5ae35f55",
+    "timestamp": "2026-04-02T00:23:10.925Z",
     "baseSymbol": "SOL",
     "quoteSymbol": "USDC",
-    "notionalUsdRequested": 4.998009935810867,
-    "notionalUsdExecuted": 4.998009935810867,
-    "sizeSolExecuted": 0.063795554,
-    "avgPriceUsd": 78.3441732602693,
+    "notionalUsdRequested": 3.9514532268322853,
+    "notionalUsdExecuted": 3.9514532268322853,
+    "sizeSolExecuted": 0.048725243,
+    "avgPriceUsd": 81.09663458902165,
     "slippageBpsSimulated": 50,
     "feesUsdSimulated": 0
   },
   "recommendations": [
-    "Risk caps are constraining trades; current approved notional 4.9980 USD.",
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
+    "Risk caps are constraining trades; current approved notional 3.9515 USD.",
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
+    "Optimizer: sample 2d, equity 99.90 -> 99.83 (-0.07%). Trades=5.",
+    "Optimizer: regime activity snapshot -> RANGE: trades=5, notional=33.00 USD.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
   ]
 }
