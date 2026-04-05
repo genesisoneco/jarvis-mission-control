@@ -1,30 +1,29 @@
 {
-  "updatedAt": "2026-04-05T12:57:36.220Z",
-  "equityUsd": 40.3193969988003,
-  "pnlUsd": -59.680603,
-  "pnlPct": -59.680603,
-  "solBalance": 138.74368300900002,
-  "usdcBalance": 35.30432877898734,
-  "netSolAccumulated": 138.74368300900002,
-  "tradeCount": 12,
+  "updatedAt": "2026-04-05T12:59:32.059Z",
+  "equityUsd": 99.47054993954954,
+  "pnlUsd": -0.52945,
+  "pnlPct": -0.52945,
+  "solBalance": 0.637481647,
+  "usdcBalance": 49.091572088154905,
+  "netSolAccumulated": 0.637481647,
+  "tradeCount": 8,
   "latestTrade": {
-    "fillId": "25f89ee6-0c16-4dc5-aee7-fc8e7f55d18d",
-    "intentId": "730da72b-6d0c-417f-82c9-00d2809d27ff",
-    "timestamp": "2026-04-03T16:49:43.762Z",
+    "fillId": "cbf5420d-7943-4b93-96c5-82b8ce778d26",
+    "intentId": "9185fd1b-5c23-4563-bf74-951420780320",
+    "timestamp": "2026-04-05T12:59:32.055Z",
     "baseSymbol": "SOL",
     "quoteSymbol": "USDC",
-    "notionalUsdRequested": 4.988195235326035,
-    "notionalUsdExecuted": 4.988195235326035,
-    "sizeSolExecuted": 138.000232137,
-    "avgPriceUsd": 0.03614628148142529,
+    "notionalUsdRequested": 6.93616809561485,
+    "notionalUsdExecuted": 6.93616809561485,
+    "sizeSolExecuted": 0.087768352,
+    "avgPriceUsd": 79.02812275220629,
     "slippageBpsSimulated": 50,
     "feesUsdSimulated": 0
   },
   "recommendations": [
-    "Risk caps are constraining trades; current approved notional 4.9882 USD.",
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
-    "Optimizer: sample 3d, equity 99.90 -> 40.32 (-59.64%). Trades=12.",
-    "Optimizer: regime activity snapshot -> BULL: trades=6, notional=42.00 USD; RANGE: trades=6, notional=40.00 USD.",
-    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
-  ]
+    "Risk caps are constraining trades; current approved notional 6.9362 USD.",
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
+  ],
+  "alert": null,
+  "status": "ok"
 }
