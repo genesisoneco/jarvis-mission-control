@@ -1,30 +1,29 @@
 {
-  "updatedAt": "2026-04-05T11:57:27.351Z",
-  "equityUsd": 40.3193969988003,
-  "pnlUsd": -59.680603,
-  "pnlPct": -59.680603,
-  "solBalance": 138.74368300900002,
-  "usdcBalance": 35.30432877898734,
-  "netSolAccumulated": 138.74368300900002,
-  "tradeCount": 12,
+  "updatedAt": "2026-04-05T11:59:32.882Z",
+  "equityUsd": 99.90753272076748,
+  "pnlUsd": -0.092467,
+  "pnlPct": -0.092467,
+  "solBalance": 0.46187660399999997,
+  "usdcBalance": 63.00513464660207,
+  "netSolAccumulated": 0.46187660399999997,
+  "tradeCount": 6,
   "latestTrade": {
-    "fillId": "25f89ee6-0c16-4dc5-aee7-fc8e7f55d18d",
-    "intentId": "730da72b-6d0c-417f-82c9-00d2809d27ff",
-    "timestamp": "2026-04-03T16:49:43.762Z",
+    "fillId": "5d022196-d2b2-4c1b-8835-e5dd6a0c8764",
+    "intentId": "5b71119b-b2a0-48ba-a1b9-8afcefd82a69",
+    "timestamp": "2026-04-05T11:59:32.877Z",
     "baseSymbol": "SOL",
     "quoteSymbol": "USDC",
-    "notionalUsdRequested": 4.988195235326035,
-    "notionalUsdExecuted": 4.988195235326035,
-    "sizeSolExecuted": 138.000232137,
-    "avgPriceUsd": 0.03614628148142529,
+    "notionalUsdRequested": 6.9979913881966915,
+    "notionalUsdExecuted": 6.9979913881966915,
+    "sizeSolExecuted": 0.087588034,
+    "avgPriceUsd": 79.89666017845191,
     "slippageBpsSimulated": 50,
     "feesUsdSimulated": 0
   },
   "recommendations": [
-    "Risk caps are constraining trades; current approved notional 4.9882 USD.",
-    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative.",
-    "Optimizer: sample 3d, equity 99.90 -> 40.32 (-59.64%). Trades=12.",
-    "Optimizer: regime activity snapshot -> BULL: trades=6, notional=42.00 USD; RANGE: trades=6, notional=40.00 USD.",
-    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
-  ]
+    "Risk caps are constraining trades; current approved notional 6.9980 USD.",
+    "Small-bankroll mode: consider revisiting per-trade and daily caps for more meaningful paper-learning while staying conservative."
+  ],
+  "alert": null,
+  "status": "ok"
 }
