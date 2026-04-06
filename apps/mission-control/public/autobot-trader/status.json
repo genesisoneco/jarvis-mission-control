@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-06T12:44:32.411Z",
+  "updatedAt": "2026-04-06T12:59:32.753Z",
   "equityUsd": 102.08905371800063,
   "pnlUsd": 2.089054,
   "pnlPct": 2.089054,
@@ -21,7 +21,10 @@
     "feesUsdSimulated": 0
   },
   "recommendations": [
-    "Risk caps are constraining trades; current approved notional 4.4974 USD."
+    "Risk caps are constraining trades; current approved notional 4.4974 USD.",
+    "Optimizer: sample 3d, equity 99.98 -> 102.09 (2.11%). Trades=14.",
+    "Optimizer: regime activity snapshot -> RANGE: trades=14, notional=98.00 USD.",
+    "Optimizer: sample too small (<5 days or <10 trades); only logging metrics, not changing parameters."
   ],
   "alert": null,
   "status": "ok"
