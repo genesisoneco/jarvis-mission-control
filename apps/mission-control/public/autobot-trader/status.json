@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-08T16:10:41.143Z",
+  "updatedAt": "2026-04-08T16:30:44.753Z",
   "equityUsd": 11637.045032136395,
   "pnlUsd": 11537.045032,
   "pnlPct": 11537.045032,
@@ -20,5 +20,9 @@
     "slippageBpsSimulated": 50,
     "feesUsdSimulated": 0
   },
-  "recommendations": []
+  "recommendations": [
+    "Optimizer: sample 6d, equity 99.90 -> 11637.05 (11548.95%). Trades=66.",
+    "Optimizer: regime activity snapshot -> BULL: trades=58, notional=8382.71 USD; RANGE: trades=8, notional=1419.98 USD.",
+    "Optimizer: paper PnL gain >= 8% (dominant regime: BULL) -> gently scaling up baseDcaUsd 7.00 -> 7.70. Risk caps unchanged."
+  ]
 }
